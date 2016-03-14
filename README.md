@@ -113,7 +113,3 @@ To employ MDL classifier on datasets stored in LIBSVM format:
 * For classifying:
 		
 		./mdl-classify -i 3 examples/libsvm_format/reuters_test.libsvm models/mdl_reuters.mod results/mdlCF_reuters.res
-
-
-
-
