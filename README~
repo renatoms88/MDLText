@@ -114,7 +114,7 @@ models/mdl_SMS.mod
 To employ MDL classifier on datasets stored in LIBSVM format:
 	- For training:
 		./mdl-train -i 3 examples/libsvm_format/reuters_train.libsvm
-models/mdl_reuters.mod
+models/mdl_SMS.mod
 		
 	- for classifying:
 		./mdl-classify -i 3 examples/libsvm_format/reuters_test.libsvm models/mdl_reuters.mod results/mdlCF_reuters.res

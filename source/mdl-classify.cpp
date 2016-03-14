@@ -149,7 +149,6 @@ map<string,vector<string>> mdlClassify(string pathDataset, string pathModel, str
     vector <int> indexes;
     vector <double> values;
 
-    int nTrain = 0;
     int nTest = 0;
 
     mdlModel mdlModel;//train model
@@ -161,7 +160,6 @@ map<string,vector<string>> mdlClassify(string pathDataset, string pathModel, str
         try {
             datasetFile.open(pathDataset.c_str()); // open the database
 
-            nTrain = 0;
             while ( datasetFile.good() )
             {
                 //cout << "Id: " << nTrain << endl;
@@ -234,7 +232,7 @@ map<string,vector<string>> mdlClassify(string pathDataset, string pathModel, str
                   //open filter_out file and update it
                   try {
 		          filter_out.open(pathResults.c_str(),ios::app);//appending the content to the current content of the file
-		          filter_out << classification[nTest] << endl;
+		          filter_out << mdlModel.classes[idxMin] << endl;
 		          filter_out.close();
 		 }
 		 catch (ifstream::failure e) {

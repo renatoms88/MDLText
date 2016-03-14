@@ -205,10 +205,6 @@ mdlModel mdlTrain(string pathDataset, string pathModel){
 
             tf2tfidf(doc, mdlModel, mdlModel.nTrain+nTrain+1, true);
 
-            for(int j=0; j<doc.indexes.size(); j++)
-            cout << doc.indexes[j] << ":" << doc.values[j] << " ";
-            cout << endl << endl;
-
             update_database(judge, doc, mdlModel);
 
             nTrain++;
@@ -232,7 +228,6 @@ mdlModel mdlTrain_text(vector <string> &judge, vector <string> &pathDoc, string 
 
    mdlModel mdlModel;//train model
    load_database(mdlModel, pathModel, true); //se o arquivo de modelo existir, carrega o modelo
-   cout << "nTrain: " << mdlModel.nTrain << endl;
 
    sparseDoc doc;
 
@@ -259,9 +254,6 @@ mdlModel mdlTrain_text(vector <string> &judge, vector <string> &pathDoc, string 
             search_dictionary(doc, mdlModel, true);//cadastra a posição onde cada token do documento está no dicionário
 
             tf2tfidf(doc, mdlModel, mdlModel.nTrain+nTrain+1, true);
-            for(int j=0; j<doc.indexes.size(); j++)
-            cout << doc.indexes[j] << ":" << doc.values[j] << " ";
-            cout << endl << endl;
 
             update_database(judge[i], doc, mdlModel);
 
@@ -313,10 +305,6 @@ mdlModel mdlTrain_textList(string pathDocs, string pathModel, int tokenizer_id, 
 
             tf2tfidf(doc, mdlModel, mdlModel.nTrain+nTrain+1, true);
 
-            for(int j=0; j<doc.indexes.size(); j++)
-            cout << doc.indexes[j] << ":" << doc.values[j] << " ";
-            cout << endl << endl;
-
             update_database(judge, doc, mdlModel);
 
             nTrain++;
@@ -336,8 +324,8 @@ void showHelp(){
         cout << "Usage: mdl-train [options] [input_fileName] [model_fileName]\n";
         cout << "\ninput_fileName:\n";
         cout << "   Relative path to a text file. Such file can be just one text sample to be trained, a index\n";
-        cout << "   file with the paths to a set of samples, a file with a sample per line in the format or a libsvm file\n";
-        cout << "   <class>,<text>\n";
+        cout << "   file with the paths to a set of samples, a file with a sample per line in the format \n";
+        cout << "   <class>,<text> or a file in libsvm format\n";
         cout << "\nmodel_fileName:\n";
         cout << "   Name given to output model created by MDL after training\n";
         cout << "\nOptions:\n";
@@ -345,7 +333,7 @@ void showHelp(){
         cout << "       0 -- the path to just one text document\n";
         cout << "       1 -- the path to a text file which has a list of paths to text documents\n";
         cout << "       2 -- the path to a text file where each line is a sample in the format <class>,<text>\n";
-        cout << "       3 -- the path to a libsvm file\n";
+        cout << "       3 -- the path to a file in libsvm format\n";
         cout << "   -c class: document class (necessary only when input_type = 0)\n";
         cout << "   -t tokenizer_id : set the type of tokenizer (default 1)\n";
         cout << "       1 -- tokenizer A: Convert any non-alphanumeric char to whitespace and tokenize by space\n";

@@ -1,0 +1,18 @@
+#!/bin/bash
+
+echo polarityReview: Train
+echo 
+./mdl-train -i 1 examples/polarityReview/polarityReview_train models/polarityReview-50.mod
+
+
+echo SMSSpamCollection: Train
+echo 
+./mdl-train -i 2 examples/SMSSpamCollection/SMSSpamCollection_train models/SMSSpamCollection-50.mod
+
+
+echo Reuters: Train
+echo 
+./mdl-train -i 3 examples/libsvm_format/reuters_train.libsvm models/mdl_reuters.mod
+
+
+
