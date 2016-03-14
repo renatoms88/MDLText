@@ -96,13 +96,9 @@ To employ MDL classifier on polarityReview text collection in which each sample 
 		./mdl-train -i 1 examples/polarityReview/polarityReview_train
 models/mdl_polarityReview.mod
 		
-	- For classifying using MDL-CF:
+	- For classifying:
 		./md-classify -i 1 examples/polarityReview/polarityReview_test
 models/mdl_polarityReview.mod results/mdlCF_polarityReview.res
-
-	- For classifying using MDL-DFS:
-		./md-classify -i 1 -f DFS examples/polarityReview/polarityReview_test
-models/mdl_polarityReview.mod results/mdlDFS_polarityReview.res
 		
 
 
@@ -111,6 +107,15 @@ To employ MDL classifier on SMS Spam Collection in which each sample is a line o
 		./mdl-train -i 2 examples/SMSSpamCollection/smsspamcollection_train
 models/mdl_SMS.mod
 		
-	- for classifying using MDL-CF:
+	- for classifying:
 		./mdl-classify -i 2 examples/SMSSpamCollection/smsspamcollection_test models/mdl_SMS.mod results/mdlCF_SMS.res
+		
+
+To employ MDL classifier on datasets stored in LIBSVM format:
+	- For training:
+		./mdl-train -i 3 examples/libsvm_format/reuters_train.libsvm
+models/mdl_SMS.mod
+		
+	- for classifying:
+		./mdl-classify -i 2 examples/libsvm_format/reuters_test.libsvm models/mdl_reuters.mod results/mdlCF_reuters.res
 
