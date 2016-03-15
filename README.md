@@ -22,6 +22,9 @@ Options:
         -3 -- the path to a file in libsvm format 
         
    -c class: document class (necessary only when input_type = 0)
+   -b batch_tfidf : set wheter the TF-IDF weight will be calculated in batch learning or does not (default 1)
+       0 -- false: the TF-IDF weigth will be calculated incrementally
+       1 -- true: the TF-IDF will be calculated in batch, that is by using information of all training documents
    -t tokenizer_id : set the type of tokenizer (default 1)
        1 -- tokenizer A: Convert any non-alphanumeric char to whitespace and tokenize by space
        2 -- tokenizer B: Tokenize by {. , ; space enter return tab} and preserve the first

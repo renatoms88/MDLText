@@ -29,6 +29,9 @@ Options:
        2 -- the path to a text file where each line is a sample in the format <class>,<text>
        3 -- the path to a file in libsvm format
    -c class: document class (necessary only when input_type = 0)
+   -b batch_tfidf : set wheter the TF-IDF weight will be calculated in batch learning or does not (default 1)
+       0 -- false: the TF-IDF weigth will be calculated incrementally
+       1 -- true: the TF-IDF will be calculated in batch, that is by using information of all training documents
    -t tokenizer_id : set the type of tokenizer (default 1)
        1 -- tokenizer A: Convert any non-alphanumeric char to whitespace and tokenize by space
        2 -- tokenizer B: Tokenize by {. , ; space enter return tab} and preserve the first
@@ -114,7 +117,7 @@ models/mdl_SMS.mod
 To employ MDL classifier on datasets stored in LIBSVM format:
 	- For training:
 		./mdl-train -i 3 examples/libsvm_format/reuters_train.libsvm
-models/mdl_reuters.mod
+models/mdl_SMS.mod
 		
 	- for classifying:
 		./mdl-classify -i 3 examples/libsvm_format/reuters_test.libsvm models/mdl_reuters.mod results/mdlCF_reuters.res

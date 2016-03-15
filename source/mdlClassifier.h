@@ -54,12 +54,12 @@ typedef struct{
 /*-------------------------- Function prototypes -------------------------*/
 
 // function at train.cpp
-mdlModel mdlTrain(string pathDataset, string pathModel);//extern "C" disable name mangling in dll creation
+mdlModel mdlTrain(string pathDataset, string pathModel, bool batch_learning);//extern "C" disable name mangling in dll creation
 
-mdlModel mdlTrain_textList(string pathDocs, string pathModel, int tokenizer_id, bool remove_stopWords, bool applyNormalization);
+mdlModel mdlTrain_textList(string pathDocs, string pathModel, int tokenizer_id, bool remove_stopWords, bool applyNormalization, bool batch_learning);
 
 mdlModel mdlTrain_text(vector <string> &judge, vector <string> &pathDoc, string pathModel,
-            int tokenizer_id, bool remove_stopWords, bool applyNormalization);
+            int tokenizer_id, bool remove_stopWords, bool applyNormalization, bool batch_learning);
 
 //function at classify.cpp
 map<string,vector<string>> mdlClassify(string pathDataset, string pathModel, string pathResults,

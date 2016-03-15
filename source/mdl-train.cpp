@@ -11,8 +11,8 @@ int main(int argc, char *argv[]) {
    vector <string> judge, pathDoc;
    string auxJudge, auxPath, pathModel;
 
-   int input_type=0, save_type=0, tokenizer_id=1, auxRemove_stopWords, auxApplyNormalization;
-   bool remove_stopWords = true, applyNormalization = false;
+   int input_type=0, save_type=0, tokenizer_id=1, auxbatch_learning=1, auxRemove_stopWords, auxApplyNormalization;
+   bool remove_stopWords = true, applyNormalization = false, batch_learning = false;
 
    if(argc<3)
         showHelp();
@@ -35,6 +35,15 @@ int main(int argc, char *argv[]) {
                         showHelp();
                 else
                     judge.push_back(argv[i+1]);
+                break;
+            case 'b':
+                auxbatch_learning =  atoi(argv[i+1]);
+                if (auxbatch_learning==0)
+                        batch_learning = false;
+                else if (auxbatch_learning==1)
+                        batch_learning = true;
+                else
+                        showHelp();
                 break;
             case 't':
                 if(input_type!=3){ //input type==3 se refere ao formato libsvm e não precisa tokenizar
@@ -86,7 +95,7 @@ int main(int argc, char *argv[]) {
         else{
             pathDoc.push_back(argv[ argc-2 ]);
             tic();
-            mdlTrain_text(judge, pathDoc, pathModel, tokenizer_id, remove_stopWords, applyNormalization);
+            mdlTrain_text(judge, pathDoc, pathModel, tokenizer_id, remove_stopWords, applyNormalization, batch_learning);
             toc();
         }
    }
@@ -112,7 +121,7 @@ int main(int argc, char *argv[]) {
                 pathDoc.push_back(auxPath);
             }
             tic();
-            mdlTrain_text(judge, pathDoc, pathModel, tokenizer_id, remove_stopWords, applyNormalization);
+            mdlTrain_text(judge, pathDoc, pathModel, tokenizer_id, remove_stopWords, applyNormalization, batch_learning);
             toc();
 
             in.close();
@@ -123,13 +132,13 @@ int main(int argc, char *argv[]) {
    else if(input_type==2){
        string pathMessages = string(argv[ argc-2 ]);
        tic();
-       mdlTrain_textList(pathMessages, pathModel, tokenizer_id, remove_stopWords, applyNormalization);
+       mdlTrain_textList(pathMessages, pathModel, tokenizer_id, remove_stopWords, applyNormalization, batch_learning);
        toc();
    }
    else if(input_type==3){
        string pathDataset = string(argv[ argc-2 ]);
        tic();
-       mdlTrain(pathDataset, pathModel);
+       mdlTrain(pathDataset, pathModel, batch_learning);
        toc();
    }
    else
@@ -146,7 +155,7 @@ int main(int argc, char *argv[]) {
    return 0;
 }
 
-mdlModel mdlTrain(string pathDataset, string pathModel){
+mdlModel mdlTrain(string pathDataset, string pathModel, bool batch_learning){
 
     string document;
     string featureRelevanceMethod = "DFS";
@@ -158,11 +167,14 @@ mdlModel mdlTrain(string pathDataset, string pathModel){
     mdlModel mdlModel;
     load_database(mdlModel, pathModel, false); //se o arquivo de modelo existir, carrega o modelo
 
-    sparseDoc doc;
+    vector<sparseDoc> doc;
+    if (!batch_learning){
+        doc.push_back(sparseDoc());//inicializa o vetor de estruturas do tipo sparseDoc
+    }
     vector <int> indexes;
     vector <double> values;
 
-    string judge;
+    vector<string> judge;
 
     try {
         datasetFile.open(pathDataset.c_str()); // open the database
@@ -186,7 +198,8 @@ mdlModel mdlTrain(string pathDataset, string pathModel){
             if(auxString == NULL || *auxString == '\n')
                 break;
 
-            judge.assign(auxString);
+            //judge.assign(auxString);
+            judge.push_back(auxString);
 
             while(1){
                 strIndex = strtok(NULL,":");
@@ -200,15 +213,37 @@ mdlModel mdlTrain(string pathDataset, string pathModel){
             }
             free(cstr2); //deallocated a block of memory previously
 
-            doc.indexes = indexes;
-            doc.values = values;
+            if(batch_learning){
+                doc.push_back(sparseDoc());
+                doc[nTrain].indexes = indexes;
+                doc[nTrain].values = values;
 
-            tf2tfidf(doc, mdlModel, mdlModel.nTrain+nTrain+1, true);
+                update_df( doc[nTrain], mdlModel );//atualiza apenas "df", que  o que necessita para aplicar tf-idf em batch
+            }
+            else{//se o treinamento não é em batch, só armazena valores na posição 0 do vetor doc para ocupar menos memória
+                doc[0].indexes = indexes;
+                doc[0].values = values;
 
-            update_database(judge, doc, mdlModel);
+                tf2tfidf(doc[0], mdlModel, nTrain+1, true);
+
+                update_database(judge[nTrain], doc[0], mdlModel);
+
+                doc[0].indexes.clear();//clear all values of the vector
+                doc[0].values.clear();//clear all values of the vector
+            }
 
             nTrain++;
         }
+
+        //aplica o TFIDF em batch, usando o df calculado anteriormente
+        if(batch_learning){
+            for(int i=0;i<doc.size();i++){
+                tf2tfidf(doc[i], mdlModel, nTrain, false);
+                update_database(judge[i], doc[i], mdlModel);
+            }
+        }
+
+
         save_database(mdlModel, pathModel, false);
     }
     catch (ifstream::failure e) {
@@ -219,7 +254,7 @@ mdlModel mdlTrain(string pathDataset, string pathModel){
 }
 
 mdlModel mdlTrain_text(vector <string> &judge, vector <string> &pathDoc, string pathModel,
-            int tokenizer_id, bool remove_stopWords, bool applyNormalization) {
+            int tokenizer_id, bool remove_stopWords, bool applyNormalization, bool batch_learning) {
 
    //string document, judge;
    map<string,string> dictionary;
@@ -229,12 +264,15 @@ mdlModel mdlTrain_text(vector <string> &judge, vector <string> &pathDoc, string 
    mdlModel mdlModel;//train model
    load_database(mdlModel, pathModel, true); //se o arquivo de modelo existir, carrega o modelo
 
-   sparseDoc doc;
+    vector<sparseDoc> doc;
+    if (!batch_learning){
+        doc.push_back(sparseDoc());//inicializa o vetor de estruturas do tipo sparseDoc
+    }
 
    //load_database(mdlModel, pathModel); //se o arquivo de modelo existir, carrega o modelo
    if (applyNormalization == true) dictionary = loadDict (PATH2DICT);
 
-   int nTrain = 0;
+   int nTrain=0;
    for (int i=0; i<pathDoc.size(); i++){
 
        //cout << "Sample: " << i << " :::::" << pathDoc[i] << endl;
@@ -248,29 +286,57 @@ mdlModel mdlTrain_text(vector <string> &judge, vector <string> &pathDoc, string 
             }
             file.close();
 
-            doc = tokenizer(texto, MAX_MESSAGE_SIZE*2, WORD_CUT_MIN, WORD_CUT_MAX, remove_stopWords, tokenizer_id);
-            if (applyNormalization == true) doc.tokens = normalizeVocabulary(doc.tokens, dictionary);
+            if(batch_learning){
+                doc.push_back(sparseDoc());//inicializa o vetor de estruturas do tipo sparseDoc
 
-            search_dictionary(doc, mdlModel, true);//cadastra a posição onde cada token do documento está no dicionário
+                doc[i] = tokenizer(texto, MAX_MESSAGE_SIZE*2, WORD_CUT_MIN, WORD_CUT_MAX, remove_stopWords, tokenizer_id);
 
-            tf2tfidf(doc, mdlModel, mdlModel.nTrain+nTrain+1, true);
+                if (applyNormalization == true) doc[i].tokens = normalizeVocabulary(doc[i].tokens, dictionary);
 
-            update_database(judge[i], doc, mdlModel);
+                search_dictionary(doc[i], mdlModel, true);//cadastra a posição onde cada token do documento está no dicionário
 
-            nTrain++;
+                update_df( doc[i], mdlModel );//atualiza apenas "df", que  o que necessita para aplicar tf-idf em batch
+            }
+            else{//se o treinamento não é em batch, só armazena valores na posição 0 do vetor doc para ocupar menos memória
+
+                doc[0] = tokenizer(texto, MAX_MESSAGE_SIZE*2, WORD_CUT_MIN, WORD_CUT_MAX, remove_stopWords, tokenizer_id);
+
+                if (applyNormalization == true) doc[0].tokens = normalizeVocabulary(doc[0].tokens, dictionary);
+
+                search_dictionary(doc[0], mdlModel, true);//cadastra a posição onde cada token do documento está no dicionário
+
+                tf2tfidf(doc[0], mdlModel, mdlModel.nTrain+i+1, true);
+
+                update_database(judge[i], doc[0], mdlModel);
+
+                doc[0].tokens.clear();//clear all values of the vector
+                doc[0].indexes.clear();//clear all values of the vector
+                doc[0].values.clear();//clear all values of the vector
+            }
        }
 
        else
           cout << "File not found: " << pathDoc[i] << endl;
+          
+       nTrain = i;
 
    }
+
+    //aplica o TFIDF em batch, usando o df calculado anteriormente
+    if(batch_learning){
+        for(int i=0;i<doc.size();i++){
+                tf2tfidf(doc[i], mdlModel, nTrain, false);
+                update_database(judge[i], doc[i], mdlModel);
+        }
+    }
 
    save_database(mdlModel, pathModel, true);
 
    return mdlModel;
 }
 
-mdlModel mdlTrain_textList(string pathDocs, string pathModel, int tokenizer_id, bool remove_stopWords, bool applyNormalization) {
+mdlModel mdlTrain_textList(string pathDocs, string pathModel, int tokenizer_id,
+                                        bool remove_stopWords, bool applyNormalization, bool batch_learning) {
 
    //string document, judge;
    map<string,string> dictionary;
@@ -279,38 +345,74 @@ mdlModel mdlTrain_textList(string pathDocs, string pathModel, int tokenizer_id, 
 
    mdlModel mdlModel;//train model
    load_database(mdlModel, pathModel, true); //se o arquivo de modelo existir, carrega o modelo
-   sparseDoc doc;
+
+    vector<sparseDoc> doc;
+    if (!batch_learning){
+        doc.push_back(sparseDoc());//inicializa o vetor de estruturas do tipo sparseDoc
+    }
+
+    vector <string> judge;
 
    //load_database(mdlModel, pathModel); //se o arquivo de modelo existir, carrega o modelo
    if (applyNormalization == true) dictionary = loadDict (PATH2DICT);
 
    if (file_exists(pathDocs.c_str())) {
-       string judge, texto;
+       string texto;
        ifstream in;     // to read the database
        in.open(pathDocs.c_str()); // open the database
        int nTrain = 0;
        while (getline(in, texto)){
 
+            judge.push_back("");
+
             //pega a primeira palavra de auxString
             stringstream ss( texto );
-            getline( ss, judge, ',' );
-            texto = texto.erase(0,judge.size()+1);//apaga o nome da classe
+            getline( ss, judge[nTrain], ',' );
+            texto = texto.erase(0,judge[nTrain].size()+1);//apaga o nome da classe
             texto += '\n';
             //cout << classe << " Text: " << texto << endl;
 
-            doc = tokenizer(texto, MAX_MESSAGE_SIZE*2, WORD_CUT_MIN, WORD_CUT_MAX, remove_stopWords, tokenizer_id);
-            if (applyNormalization == true) doc.tokens = normalizeVocabulary(doc.tokens, dictionary);
+            if(batch_learning){
+                doc.push_back(sparseDoc());//inicializa o vetor de estruturas do tipo sparseDoc
 
-            search_dictionary(doc, mdlModel, true);//cadastra a posição onde cada token do documento está no dicionário
+                doc[nTrain] = tokenizer(texto, MAX_MESSAGE_SIZE*2, WORD_CUT_MIN, WORD_CUT_MAX, remove_stopWords, tokenizer_id);
 
-            tf2tfidf(doc, mdlModel, mdlModel.nTrain+nTrain+1, true);
+                if (applyNormalization == true) doc[nTrain].tokens = normalizeVocabulary(doc[nTrain].tokens, dictionary);
 
-            update_database(judge, doc, mdlModel);
+                search_dictionary(doc[nTrain], mdlModel, true);//cadastra a posição onde cada token do documento está no dicionário
+
+                update_df( doc[nTrain], mdlModel );//atualiza apenas "df", que  o que necessita para aplicar tf-idf em batch
+            }
+            else{//se o treinamento não é em batch, só armazena valores na posição 0 do vetor doc para ocupar menos memória
+
+                doc[0] = tokenizer(texto, MAX_MESSAGE_SIZE*2, WORD_CUT_MIN, WORD_CUT_MAX, remove_stopWords, tokenizer_id);
+
+                if (applyNormalization == true) doc[0].tokens = normalizeVocabulary(doc[0].tokens, dictionary);
+
+                search_dictionary(doc[0], mdlModel, true);//cadastra a posição onde cada token do documento está no dicionário
+
+                tf2tfidf(doc[0], mdlModel, mdlModel.nTrain+nTrain+1, true);
+
+                update_database(judge[nTrain], doc[0], mdlModel);
+
+                doc[0].tokens.clear();//clear all values of the vector
+                doc[0].indexes.clear();//clear all values of the vector
+                doc[0].values.clear();//clear all values of the vector
+            }
 
             nTrain++;
 
        }
        in.close();
+
+        //aplica o TFIDF em batch, usando o df calculado anteriormente
+        if(batch_learning){
+            for(int i=0;i<doc.size();i++){
+                    tf2tfidf(doc[i], mdlModel, nTrain, false);
+                    update_database(judge[i], doc[i], mdlModel);
+            }
+        }
+
        save_database(mdlModel, pathModel, true);
    }
    else
@@ -335,6 +437,9 @@ void showHelp(){
         cout << "       2 -- the path to a text file where each line is a sample in the format <class>,<text>\n";
         cout << "       3 -- the path to a file in libsvm format\n";
         cout << "   -c class: document class (necessary only when input_type = 0)\n";
+        cout << "   -b batch_learning : set wheter the TF-IDF weight will be calculated in batch learning or does not (default 1)\n";
+        cout << "       0 -- false: the TF-IDF weigth will be calculated incrementally\n";
+        cout << "       1 -- true: the TF-IDF will be calculated in batch, that is by using information of all training documents\n";
         cout << "   -t tokenizer_id : set the type of tokenizer (default 1)\n";
         cout << "       1 -- tokenizer A: Convert any non-alphanumeric char to whitespace and tokenize by space\n";
         cout << "       2 -- tokenizer B: Tokenize by {. , ; space enter return tab} and preserve the first\n";
