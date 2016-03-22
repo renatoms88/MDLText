@@ -4,16 +4,17 @@
 ## How to use mdl-train
 
 ------------------------------------------------------------------------------
-Usage: 
-```mdl-train [options] [input_fileName] [model_fileName]``` 
+Usage: ```mdl-train [options] [input_fileName] [model_fileName]``` 
 
-```input_fileName: Relative path to a text file. Such file can be just one text sample to be trained, a index
+```
+input_fileName: 
+   Relative path to a text file. Such file can be just one text sample to be trained, a index
    file with the paths to a set of samples, a file with a sample per line in the format
    <class>,<text> or a file in libsvm format  ```
 
-```model_fileName: Name given to output model created by MDL after training```
+model_fileName: 
+    Name given to output model created by MDL after training```
 
-```
 Options:
     -i input_type : set type of input file (default 0)  
         -0 -- the path to just one text document  
