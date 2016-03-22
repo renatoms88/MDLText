@@ -11,8 +11,8 @@ int main(int argc, char *argv[]) {
    vector <string> judge, pathDoc;
    string auxJudge, auxPath, pathModel;
 
-   int input_type=0, save_type=0, tokenizer_id=1, auxbatch_learning=1, auxRemove_stopWords, auxApplyNormalization;
-   bool remove_stopWords = true, applyNormalization = false, batch_learning = false;
+   int input_type=0, save_type=0, tokenizer_id=1, auxbatch_learning=1, weighting_scheme=1, auxRemove_stopWords, auxApplyNormalization;
+   bool remove_stopWords = true, applyNormalization = false, batch_learning = true;
 
    if(argc<3)
         showHelp();
@@ -36,11 +36,16 @@ int main(int argc, char *argv[]) {
                 else
                     judge.push_back(argv[i+1]);
                 break;
+            case 'w':
+                weighting_scheme =  atoi(argv[i+1]);
+                if(weighting_scheme<0 || weighting_scheme>2)
+                        showHelp();
+                break;
             case 'b':
                 auxbatch_learning =  atoi(argv[i+1]);
-                if (auxbatch_learning==0)
+                if (weighting_scheme==1 && auxbatch_learning==0)
                         batch_learning = false;
-                else if (auxbatch_learning==1)
+                else if (weighting_scheme==1 && auxbatch_learning==1)
                         batch_learning = true;
                 else
                         showHelp();
@@ -86,6 +91,9 @@ int main(int argc, char *argv[]) {
         }
    }
 
+   if (weighting_scheme!=1)
+        batch_learning = false;
+
    pathModel = string(argv[ argc-1 ]);//a ultima entrada é o nome do modelo
 
    if(input_type==0){// se o input_type==0, é preciso indicar a classe do documento
@@ -95,7 +103,7 @@ int main(int argc, char *argv[]) {
         else{
             pathDoc.push_back(argv[ argc-2 ]);
             tic();
-            mdlTrain_text(judge, pathDoc, pathModel, tokenizer_id, remove_stopWords, applyNormalization, batch_learning);
+            mdlTrain_text(judge, pathDoc, pathModel, tokenizer_id, remove_stopWords, applyNormalization, weighting_scheme, batch_learning);
             toc();
         }
    }
@@ -121,7 +129,7 @@ int main(int argc, char *argv[]) {
                 pathDoc.push_back(auxPath);
             }
             tic();
-            mdlTrain_text(judge, pathDoc, pathModel, tokenizer_id, remove_stopWords, applyNormalization, batch_learning);
+            mdlTrain_text(judge, pathDoc, pathModel, tokenizer_id, remove_stopWords, applyNormalization, weighting_scheme, batch_learning);
             toc();
 
             in.close();
@@ -132,13 +140,13 @@ int main(int argc, char *argv[]) {
    else if(input_type==2){
        string pathMessages = string(argv[ argc-2 ]);
        tic();
-       mdlTrain_textList(pathMessages, pathModel, tokenizer_id, remove_stopWords, applyNormalization, batch_learning);
+       mdlTrain_textList(pathMessages, pathModel, tokenizer_id, remove_stopWords, applyNormalization, weighting_scheme, batch_learning);
        toc();
    }
    else if(input_type==3){
        string pathDataset = string(argv[ argc-2 ]);
        tic();
-       mdlTrain(pathDataset, pathModel, batch_learning);
+       mdlTrain(pathDataset, pathModel, weighting_scheme, batch_learning);
        toc();
    }
    else
@@ -155,7 +163,7 @@ int main(int argc, char *argv[]) {
    return 0;
 }
 
-mdlModel mdlTrain(string pathDataset, string pathModel, bool batch_learning){
+mdlModel mdlTrain(string pathDataset, string pathModel, int weighting_scheme, bool batch_learning){
 
     string document;
     string featureRelevanceMethod = "DFS";
@@ -224,7 +232,14 @@ mdlModel mdlTrain(string pathDataset, string pathModel, bool batch_learning){
                 doc[0].indexes = indexes;
                 doc[0].values = values;
 
-                tf2tfidf(doc[0], mdlModel, nTrain+1, true);
+                update_df( doc[0], mdlModel );//atualiza apenas "df", que  o que necessita para aplicar tf-idf em batch
+
+                if(weighting_scheme==1){
+                    cout << "\n\nTF-IDF" << endl;
+                    tf2tfidf(doc[0], mdlModel, nTrain+1, false);
+                    }
+                else if(weighting_scheme==2)
+                    binarize(doc[0]);
 
                 update_database(judge[nTrain], doc[0], mdlModel);
 
@@ -243,7 +258,7 @@ mdlModel mdlTrain(string pathDataset, string pathModel, bool batch_learning){
             }
         }
 
-
+        mdlModel.norm_protype = l2_norm_prototype(mdlModel.weightSum, mdlModel.trained);
         save_database(mdlModel, pathModel, false);
     }
     catch (ifstream::failure e) {
@@ -254,7 +269,7 @@ mdlModel mdlTrain(string pathDataset, string pathModel, bool batch_learning){
 }
 
 mdlModel mdlTrain_text(vector <string> &judge, vector <string> &pathDoc, string pathModel,
-            int tokenizer_id, bool remove_stopWords, bool applyNormalization, bool batch_learning) {
+            int tokenizer_id, bool remove_stopWords, bool applyNormalization, int weighting_scheme, bool batch_learning) {
 
    //string document, judge;
    map<string,string> dictionary;
@@ -305,7 +320,12 @@ mdlModel mdlTrain_text(vector <string> &judge, vector <string> &pathDoc, string 
 
                 search_dictionary(doc[0], mdlModel, true);//cadastra a posição onde cada token do documento está no dicionário
 
-                tf2tfidf(doc[0], mdlModel, mdlModel.nTrain+i+1, true);
+                update_df( doc[0], mdlModel );//atualiza apenas "df", que  o que necessita para aplicar tf-idf em batch
+
+                if(weighting_scheme==1)
+                    tf2tfidf(doc[0], mdlModel, mdlModel.nTrain+i+1, false);
+                else if(weighting_scheme==2)
+                    binarize(doc[0]);
 
                 update_database(judge[i], doc[0], mdlModel);
 
@@ -317,7 +337,7 @@ mdlModel mdlTrain_text(vector <string> &judge, vector <string> &pathDoc, string 
 
        else
           cout << "File not found: " << pathDoc[i] << endl;
-          
+
        nTrain = i;
 
    }
@@ -330,13 +350,14 @@ mdlModel mdlTrain_text(vector <string> &judge, vector <string> &pathDoc, string 
         }
     }
 
+   mdlModel.norm_protype = l2_norm_prototype(mdlModel.weightSum, mdlModel.trained);
    save_database(mdlModel, pathModel, true);
 
    return mdlModel;
 }
 
 mdlModel mdlTrain_textList(string pathDocs, string pathModel, int tokenizer_id,
-                                        bool remove_stopWords, bool applyNormalization, bool batch_learning) {
+                                        bool remove_stopWords, bool applyNormalization, int weighting_scheme, bool batch_learning) {
 
    //string document, judge;
    map<string,string> dictionary;
@@ -391,7 +412,12 @@ mdlModel mdlTrain_textList(string pathDocs, string pathModel, int tokenizer_id,
 
                 search_dictionary(doc[0], mdlModel, true);//cadastra a posição onde cada token do documento está no dicionário
 
-                tf2tfidf(doc[0], mdlModel, mdlModel.nTrain+nTrain+1, true);
+                update_df( doc[0], mdlModel );//atualiza apenas "df", que  o que necessita para aplicar tf-idf em batch
+
+                if(weighting_scheme==1)
+                    tf2tfidf(doc[0], mdlModel, mdlModel.nTrain+nTrain+1, false);
+                else if(weighting_scheme==2)
+                    binarize(doc[0]);
 
                 update_database(judge[nTrain], doc[0], mdlModel);
 
@@ -413,6 +439,7 @@ mdlModel mdlTrain_textList(string pathDocs, string pathModel, int tokenizer_id,
             }
         }
 
+       mdlModel.norm_protype = l2_norm_prototype(mdlModel.weightSum, mdlModel.trained);
        save_database(mdlModel, pathModel, true);
    }
    else
@@ -435,9 +462,15 @@ void showHelp(){
         cout << "       0 -- the path to just one text document\n";
         cout << "       1 -- the path to a text file which has a list of paths to text documents\n";
         cout << "       2 -- the path to a text file where each line is a sample in the format <class>,<text>\n";
-        cout << "       3 -- the path to a file in libsvm format\n";
+        cout << "       3 -- the path to a file in LIBSVM format\n";
         cout << "   -c class: document class (necessary only when input_type = 0)\n";
-        cout << "   -b batch_learning : set wheter the TF-IDF weight will be calculated in batch learning or does not (default 1)\n";
+        cout << "   -w term weighting scheme: set the the term weighting scheme (default 1)\n";
+        cout << "       0 -- if input type is a path to a file in LIBSVM format, will be used the weigths shown in the file,\n";
+        cout << "                           otherwise it will be used the raw term-frequency (TF) weighting scheme\n";
+        cout << "       1 -- term frequency-inverse document frequency (TF-IDF)\n";
+        cout << "       2 -- binary\n";
+        cout << "   -b batch_learning TF-IDF: set wheter the TF-IDF weight will be calculated in batch learning or does not (default 1)\n";
+        cout << "                          (necessary only when term weighting scheme = 1)\n";
         cout << "       0 -- false: the TF-IDF weigth will be calculated incrementally\n";
         cout << "       1 -- true: the TF-IDF will be calculated in batch, that is by using information of all training documents\n";
         cout << "   -t tokenizer_id : set the type of tokenizer (default 1)\n";

@@ -29,6 +29,11 @@ Options:
        2 -- the path to a text file where each line is a sample in the format <class>,<text>
        3 -- the path to a file in libsvm format
    -c class: document class (necessary only when input_type = 0)
+   -w term weighting scheme: set the the term weighting scheme (default 1)
+   	0 -- if input type is a path to a file in LIBSVM format, will be used the weigths shown in the file,
+   			otherwise it will be used the raw term-frequency (TF) weighting scheme
+   	1 -- term frequency-inverse document frequency (TF-IDF)
+   	2 -- binary
    -b batch_tfidf : set wheter the TF-IDF weight will be calculated in batch learning or does not (default 1)
        0 -- false: the TF-IDF weigth will be calculated incrementally
        1 -- true: the TF-IDF will be calculated in batch, that is by using information of all training documents
@@ -69,6 +74,11 @@ Options:
        1 -- the path to a text file which has a list of paths to text documents
        2 -- the path to a text file where each line is a sample
        3 -- the path to a file in libsvm format
+   -w term weighting scheme: set the the term weighting scheme (default 1)
+   	0 -- if input type is a path to a file in LIBSVM format, will be used the weigths shown in the file,
+   			otherwise it will be used the raw term-frequency (TF) weighting scheme
+   	1 -- term frequency-inverse document frequency (TF-IDF)
+   	2 -- binary
    -t tokenizer_id : set the type of tokenizer (default 1)
        1 -- tokenizer A: Convert any non-alphanumeric char to whitespace and tokenize by space
        2 -- tokenizer B: Tokenize by {. , ; space enter return tab} and preserve the first

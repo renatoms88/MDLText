@@ -21,7 +21,7 @@ void tf2tfidf(sparseDoc &doc, mdlModel &mdlModel, int nDocs, bool update_docFreq
 
     //cout << "Ndocs: " << nDocs << endl;
     //for(int i=0; i<mdlModel.df.size(); i++){
-    //	cout << mdlModel.df[i] << endl; 
+    //	cout << mdlModel.df[i] << endl;
     //}
 
     vector<double> idf( doc.indexes.size(),0 );//inicializa com valor 0
@@ -50,12 +50,35 @@ void tf2tfidf(sparseDoc &doc, mdlModel &mdlModel, int nDocs, bool update_docFreq
     }
 }
 
+void binarize(sparseDoc &doc){
+    for(int i=0; i<doc.indexes.size(); i++){
+        doc.values[i] = 1;
+    }
+}
+
 double l2_norm(vector<double> const& u) {
     double accum = 0.;
     for (int i = 0; i < u.size(); ++i) {
         accum += u[i] * u[i];
     }
     return sqrt(accum);
+}
+
+vector <double> l2_norm_prototype(vector < vector<double> > &weightSum, vector <int> &trained) {
+
+    double aux_weight;
+    vector <double> norm_protype(trained.size(),0.0);
+
+    for (int k=0; k<trained.size(); ++k){
+        double accum = 0.;
+        for(int i=0; i<weightSum.size(); i++){
+            aux_weight = weightSum[i][k] / (double)trained[k];
+            accum += aux_weight * aux_weight;
+        }
+        norm_protype[k] = sqrt(accum);
+    }
+
+    return norm_protype;
 }
 
 bool file_exists(const char * filename) {

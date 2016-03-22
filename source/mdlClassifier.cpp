@@ -3,7 +3,7 @@
 /* -------------------- Local function prototypes ------------------------ */
 
 uint8_t calculate_token_size(double n, double d, double omega);
-double calculate_cosineSimilarity( sparseDoc &doc, vector <double> &prototype, double norm_doc, double norm_protype );
+double calculate_cosineSimilarity( sparseDoc &doc, double norm_doc, mdlModel &mdlModel, int idClasse );
 
 /* ----------------------------- Routines --------------------------------- */
 
@@ -17,24 +17,6 @@ vector <double> mdl(sparseDoc doc, mdlModel &mdlModel, string featureRelevanceMe
 	double norm_doc = l2_norm( doc.values );
 
 	vector <double> class_size(nClasses,0.0);//inicializa com valor 0
-
-    vector<vector <double>> prototype(nClasses,vector <double>(mdlModel.frequency.size(),0.0));
-
-	vector <double> norm_protype(nClasses,0.0);
-	for (int k=0; k<nClasses; ++k){
-        mdlModel.NC_weight[k] = 0.0;
-        //cout << "trained[k]" << mdlModel.trained[k] << endl;
-        for(int i=0; i<mdlModel.frequency.size(); i++){
-            prototype[k][i] = mdlModel.weightSum[i][k]/ (double)mdlModel.trained[k];
-            //cout << "frequency[i][k]: " << mdlModel.frequency[i][k] << endl;
-            //cout << "prototype " << k << " " << i << ": " << prototype[k][i] << endl;
-            mdlModel.NC_weight[k] += mdlModel.weightSum[i][k];
-        }
-        //cout << endl;
-        norm_protype[k] = l2_norm( prototype[k] );
-        //cout << "Norm: " << norm_protype[k];
-    }
-    //cout << endl;
 
 	// for each token presented into database
 	for (int j=0; j<doc.indexes.size();j++) {
@@ -81,7 +63,7 @@ vector <double> mdl(sparseDoc doc, mdlModel &mdlModel, string featureRelevanceMe
 
 	//acrescenta a similaridade de cosine
 	for (int i=0; i<nClasses; ++i){
-        cosine_similarity[i] = calculate_cosineSimilarity( doc, prototype[i], norm_doc, norm_protype[i] );
+        cosine_similarity[i] = calculate_cosineSimilarity( doc, norm_doc, mdlModel, i);
         class_size[i] *= -log2(0.5*cosine_similarity[i]);
         //cout << "normDoc: " << norm_doc << endl;
         //cout << "normPrototype: " << norm_protype[i] << endl;
@@ -114,12 +96,14 @@ uint8_t calculate_token_size(double n, double d, double omega)
 	return (token_size);
 }
 
-double calculate_cosineSimilarity( sparseDoc &doc, vector <double> &prototype, double norm_doc, double norm_protype ){
+double calculate_cosineSimilarity( sparseDoc &doc, double norm_doc, mdlModel &mdlModel, int idClasse ){
     double similarity = 0.0;
+    double prototype;
     //cout << endl << endl;
     for(int i=0; i<doc.values.size(); i++){
-        if( prototype.size() > doc.indexes[i]-1){ //se o token não apareceu no treinamento, desconsiderá-lo
-            similarity += (doc.values[i]*prototype[ doc.indexes[i]-1 ]) / (double)(norm_doc*norm_protype);
+        if( mdlModel.weightSum.size() > doc.indexes[i]-1){ //se o token não apareceu no treinamento, desconsiderá-lo
+            prototype = mdlModel.weightSum[ doc.indexes[i]-1 ][idClasse] / (double)mdlModel.trained[idClasse];
+            similarity += (doc.values[i]*prototype) / (double)(norm_doc*mdlModel.norm_protype[idClasse]);
             //cout << " ::" << doc.values[i] << " " << prototype[ doc.indexes[i]-1 ] << endl;
         }
     }

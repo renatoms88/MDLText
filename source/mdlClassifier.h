@@ -43,6 +43,7 @@ typedef struct{
   vector <int> df; //document frequency of each token
   vector < vector<int> > frequency;
   vector < vector<double> > weightSum; //soma dos pesos de cada token para cada classe
+  vector <double> norm_protype;
 } mdlModel;
 
 typedef struct{
@@ -54,21 +55,21 @@ typedef struct{
 /*-------------------------- Function prototypes -------------------------*/
 
 // function at train.cpp
-mdlModel mdlTrain(string pathDataset, string pathModel, bool batch_learning);//extern "C" disable name mangling in dll creation
+mdlModel mdlTrain(string pathDataset, string pathModel, int weighting_scheme, bool batch_learning);//extern "C" disable name mangling in dll creation
 
-mdlModel mdlTrain_textList(string pathDocs, string pathModel, int tokenizer_id, bool remove_stopWords, bool applyNormalization, bool batch_learning);
+mdlModel mdlTrain_textList(string pathDocs, string pathModel, int tokenizer_id, bool remove_stopWords, bool applyNormalization, int weighting_scheme, bool batch_learning);
 
 mdlModel mdlTrain_text(vector <string> &judge, vector <string> &pathDoc, string pathModel,
-            int tokenizer_id, bool remove_stopWords, bool applyNormalization, bool batch_learning);
+            int tokenizer_id, bool remove_stopWords, bool applyNormalization, int weighting_scheme, bool batch_learning);
 
 //function at classify.cpp
 map<string,vector<string>> mdlClassify(string pathDataset, string pathModel, string pathResults,
-                      string featureRelevanceMethod, double omega);
+                      string featureRelevanceMethod, double omega, int weighting_scheme);
 vector<string> mdlClassify_textList(string pathDocs, string pathModel, string pathResults,
-                         string featureRelevanceMethod, double omega, int tokenizer_id, bool remove_stopWords, bool applyNormalization);
+                         string featureRelevanceMethod, double omega, int tokenizer_id, bool remove_stopWords, bool applyNormalization, int weighting_scheme);
 
 vector<string> mdlClassify_text(vector <string> &pathDoc, string pathModel, string pathResults,
-                string featureRelevanceMethod, double omega, int tokenizer_id, bool remove_stopWords, bool applyNormalization);
+                string featureRelevanceMethod, double omega, int tokenizer_id, bool remove_stopWords, bool applyNormalization, int weighting_scheme);
 
 // function at database.cpp
 map<string,vector <int>> read_database(const string &databasename,
@@ -98,7 +99,9 @@ double calcula_dfs(vector <int> &token_freq, mdlModel &mdlModel);
 //file: utils.cpp
 void update_df( sparseDoc doc, mdlModel &mdlModel );
 void tf2tfidf( sparseDoc &doc, mdlModel &mdlModel, int nDocs, bool update_docFrequency );
+void binarize( sparseDoc &doc );
 double l2_norm(vector<double> const& u);
+vector <double> l2_norm_prototype(vector < vector<double> > &weightSum, vector <int> &trained);
 bool file_exists(const char * filename);
 string NumberToString ( int Number );
 std::string strReplace(std::string subject, const std::string search,

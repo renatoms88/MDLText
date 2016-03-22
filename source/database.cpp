@@ -7,16 +7,6 @@ void verificaClasse(mdlModel &mdlModel, string classe);
 
 /* ----------------------------- Routines --------------------------------- */
 
-// Function: Search for a set of tokens in the database
-//   inputs: The name of the database and the tokens to be searched.
-//   output: The tokens that are present in the database (in map structure).
-map<string,vector <int>> read_database(const string &databasename, statistics &dbstat, set<string> classes) {
-
-   cout << "Function Read Database";
-}
-
-
-
 // Function: Update the database with some tokens judged as hams or spams
 // inputs  : The name of database, the new tokens and their class (ham or spam)
 // outputs : no outputs
@@ -31,7 +21,7 @@ void update_database(string judge, sparseDoc doc, mdlModel &mdlModel){
             for (int k=0; k<nClasses; k++){
                 mdlModel.trained.push_back(0);//indica a quantidade de documentos de cada classe
                 mdlModel.NC.push_back(0);//indica a quantidade de tokens para cada classe
-                mdlModel.NC_weight.push_back(0.0);//indica a quantidade de tokens para cada classe
+                mdlModel.NC_weight.push_back(0.0);//indica a soma dos pesos dos tokens de cada classe
             }
     }
 
@@ -65,6 +55,7 @@ void update_database(string judge, sparseDoc doc, mdlModel &mdlModel){
                     if( doc.values[i]>0 )
                         mdlModel.frequency[ doc.indexes[i]-1 ][k] ++;
                         mdlModel.weightSum[ doc.indexes[i]-1 ][k] += doc.values[i];
+                        mdlModel.NC_weight[k] += doc.values[i];
                 }
         }
     }
@@ -122,9 +113,12 @@ void save_database(mdlModel &mdlModel, string pathModel, bool save_tokens){
             for (int k=0; k<mdlModel.classes.size(); k++){
                 odatabase <<  mdlModel.NC[k] << " ";
             }
-            //for (int k=0; k<mdlModel.classes.size(); k++){
-            //    odatabase <<  mdlModel.NC_weight[k] << " ";
-            //}
+            for (int k=0; k<mdlModel.classes.size(); k++){
+                odatabase <<  mdlModel.NC_weight[k] << " ";
+            }
+            for (int k=0; k<mdlModel.classes.size(); k++){
+                odatabase <<  mdlModel.norm_protype[k] << " ";
+            }
             odatabase << "\n";
 
             for (int j=0; j<mdlModel.frequency.size(); j++){
@@ -193,7 +187,12 @@ void load_database(mdlModel &mdlModel, string pathModel, bool get_tokens){
         }
         //inicializa soma dos pesos dos tokens de cada classe
         for (int i=0; i<nClasses; ++i){
-                mdlModel.NC_weight.push_back( 0.0 ); //read the database header
+                in >> auxValue;
+                mdlModel.NC_weight.push_back( atof(auxValue.c_str()) ); //read the database header
+        }
+        for (int i=0; i<nClasses; ++i){
+                in >> auxValue;
+                mdlModel.norm_protype.push_back( atof(auxValue.c_str()) ); //read the database header
         }
 
         while( in.good() ) {     // read all the tokens in the database
