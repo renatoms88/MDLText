@@ -19,9 +19,8 @@ int main(int argc, char *argv[]) {
    if(argc<4)
         showHelp();
 
-   //cout << "Argc: " << argc;
    for(int i=1;i<argc-3;i+=2){
-        //cout << argv[i] << "-" << argv[i+1] << endl;
+
         if(argv[i][0] != '-'){
             showHelp();
             break;
@@ -128,9 +127,6 @@ int main(int argc, char *argv[]) {
    else
         showHelp();
 
-//   cout << "\ninput_type: " << input_type;
-//   cout << "\nPathDoc: " << argv[ argc-3 ];
-//  cout << "\nPathModel: " << pathModel;
    double elapsedTime = get_elapsed_time();
    printf("Classification completed!\n");
    printf("CPU elapsed time (ms): %lf\n\n", elapsedTime);
@@ -140,7 +136,6 @@ int main(int argc, char *argv[]) {
 
 map<string,vector<string>> mdlClassify(string pathDataset, string pathModel, string pathResults, string featureRelevanceMethod, double omega, int weighting_scheme){
 
-    //cout << "\n\n========== Classify ============\n\n";
     string document;
     vector <string> classification, judge;
     map <string, vector<string>> yTeste_dTeste;
@@ -167,13 +162,11 @@ map<string,vector<string>> mdlClassify(string pathDataset, string pathModel, str
 
             while ( datasetFile.good() )
             {
-                //cout << "Id: " << nTrain << endl;
                 indexes.clear();//limpa o vetores de índices
                 values.clear();//limpa o vetores de índices
 
                 string str_line;
                 getline(datasetFile, str_line); //le a linha inteira onde estão os nomes das classes
-                //cout << str_line << endl;
 
                 //create a c_str copy of string classes
                 char *cstr2 = new char [str_line.length()+1];
@@ -200,7 +193,6 @@ map<string,vector<string>> mdlClassify(string pathDataset, string pathModel, str
                 doc.indexes = indexes;
                 doc.values = values;
 
-		        //cout << "Ntrain: " << mdlModel.nTrain << endl;
 		        if(weighting_scheme==1)
                     tf2tfidf(doc, mdlModel, mdlModel.nTrain, false);
                 else if(weighting_scheme==2)
@@ -208,11 +200,10 @@ map<string,vector<string>> mdlClassify(string pathDataset, string pathModel, str
 
                 vector <double> class_size = mdl(doc, mdlModel, featureRelevanceMethod, omega);
 
-                   //cout << "\nClasses size: ";
 
                    int idxMin=0;
                    double minClassSize = class_size[0];
-                   //printf("%1.8f ",class_size[0]);
+
                    for (int j=1; j<mdlModel.classes.size(); ++j){
                             if (class_size[j] < minClassSize){
                                     idxMin = j;
@@ -224,16 +215,12 @@ map<string,vector<string>> mdlClassify(string pathDataset, string pathModel, str
                                     prob_class_j = mdlModel.trained[j] / sumTrain;
                                     prob_class_min = mdlModel.trained[idxMin] / sumTrain;
 
-                                        //cout << "\nprob_class_j: " << prob_class_j << "\nprob_class_min: " << prob_class_min;
-
                                     if(prob_class_j > prob_class_min){
                                             idxMin = j;
                                             minClassSize = class_size[j];
                                     }
                             }
-                            //printf("%1.8f ",class_size[j]);
                    }
-                   //cout << endl;
 
                    classification.push_back( mdlModel.classes[idxMin] );
 
@@ -246,9 +233,6 @@ map<string,vector<string>> mdlClassify(string pathDataset, string pathModel, str
 		 catch (ifstream::failure e) {
 		  cerr << e.what() << endl;
 		 }
-
-                  //print the results on the screen
-                  //cout << "class=" << classification[nTrain] << endl;
 
                   nTest++;
 
@@ -328,11 +312,10 @@ vector<string> mdlClassify_text(vector <string> &pathDoc, string pathModel, stri
 
                       // classify the message using MDL classifier
                       vector <double> class_size = mdl(doc, mdlModel, featureRelevanceMethod, omega);
-                       //cout << "\nClasses size: ";
 
                        int idxMin=0;
                        double minClassSize = class_size[0];
-                       //printf("%1.8f ",class_size[0]);
+                       
                        for (int j=1; j<mdlModel.classes.size(); ++j){
                                 if (class_size[j] < minClassSize){
                                         idxMin = j;
@@ -344,16 +327,12 @@ vector<string> mdlClassify_text(vector <string> &pathDoc, string pathModel, stri
                                         prob_class_j = mdlModel.trained[j] / sumTrain;
                                         prob_class_min = mdlModel.trained[idxMin] / sumTrain;
 
-                                            //cout << "\nprob_class_j: " << prob_class_j << "\nprob_class_min: " << prob_class_min;
-
                                         if(prob_class_j > prob_class_min){
                                                 idxMin = j;
                                                 minClassSize = class_size[j];
                                         }
                                 }
-                                //printf("%1.8f",class_size[j]);
                        }
-                       //cout << endl;
 
                         classification.push_back( mdlModel.classes[idxMin] );
 
@@ -417,7 +396,6 @@ vector<string> mdlClassify_textList(string pathDocs, string pathModel, string pa
 
                       search_dictionary(doc, mdlModel, false);//cadastra a posição onde cada token do documento está no dicionário
 
-		      //cout << "Ntrain: " << mdlModel.nTrain << endl;
                       if(weighting_scheme==1)
                             tf2tfidf(doc, mdlModel, mdlModel.nTrain, false);
                       else if(weighting_scheme==2)
@@ -426,11 +404,9 @@ vector<string> mdlClassify_textList(string pathDocs, string pathModel, string pa
                       // classify the message using MDL classifier
                       vector <double> class_size = mdl(doc, mdlModel, featureRelevanceMethod, omega);
 
-               //cout << "\nClasses size: ";
-
                int idxMin=0;
                double minClassSize = class_size[0];
-               //printf("%1.8f ",class_size[0]);
+
                for (int j=1; j<mdlModel.classes.size(); ++j){
                         if (class_size[j] < minClassSize){
                                 idxMin = j;
@@ -442,20 +418,15 @@ vector<string> mdlClassify_textList(string pathDocs, string pathModel, string pa
                                 prob_class_j = mdlModel.trained[j] / sumTrain;
                                 prob_class_min = mdlModel.trained[idxMin] / sumTrain;
 
-                                    //cout << "\nprob_class_j: " << prob_class_j << "\nprob_class_min: " << prob_class_min;
-
                                 if(prob_class_j > prob_class_min){
                                         idxMin = j;
                                         minClassSize = class_size[j];
                                 }
                         }
-                        //printf("%1.8f",class_size[j]);
                }
-               //cout << endl;
 
                classification.push_back( mdlModel.classes[idxMin] );
 
-               //cout << "idxMin: " << idxMin << " Classe: " << mdlModel.classes[idxMin] << endl;
                filter_out << mdlModel.classes[idxMin] << endl;
             }
             in.close();

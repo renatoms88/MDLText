@@ -19,11 +19,6 @@ void tf2tfidf(sparseDoc &doc, mdlModel &mdlModel, int nDocs, bool update_docFreq
             update_df( doc, mdlModel );
     }
 
-    //cout << "Ndocs: " << nDocs << endl;
-    //for(int i=0; i<mdlModel.df.size(); i++){
-    //	cout << mdlModel.df[i] << endl;
-    //}
-
     vector<double> idf( doc.indexes.size(),0 );//inicializa com valor 0
 
     for(int i=0; i<doc.indexes.size(); i++){
@@ -36,8 +31,6 @@ void tf2tfidf(sparseDoc &doc, mdlModel &mdlModel, int nDocs, bool update_docFreq
         }
 
         doc.values[i] *= idf[i]; //TF*IDF
-        //cout << "1+nDocs:" << log10(3/2);
-        //cout << " idf[i]: " << idf[i] << " " << "df[i]: " << mdlModel.df[doc.indexes[i]-1] << " ";
     }
 
     double norm = l2_norm( doc.values );
@@ -45,7 +38,6 @@ void tf2tfidf(sparseDoc &doc, mdlModel &mdlModel, int nDocs, bool update_docFreq
     if(norm>0){
         for(int i=0; i<doc.indexes.size(); i++){
             doc.values[i] /= norm;
-            //cout << "doc.values[i]: " << doc.values[i] << " ";
         }
     }
 }

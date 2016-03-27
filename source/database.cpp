@@ -12,7 +12,6 @@ void verificaClasse(mdlModel &mdlModel, string classe);
 // outputs : no outputs
 void update_database(string judge, sparseDoc doc, mdlModel &mdlModel){
 
-    //cout << "\nEntrou update database";
     verificaClasse(mdlModel, judge);
     int nClasses = mdlModel.classes.size();
 
@@ -33,7 +32,6 @@ void update_database(string judge, sparseDoc doc, mdlModel &mdlModel){
     }
 
     //atualiza a frequencia dos tokens
-    //cout << "\n\tAtualiza frequencia";
     for (int i=0;i<doc.indexes.size();i++){
         //se houver tokens ainda não cadastrados, devem ser inicializados com frequencia 0
         if (mdlModel.frequency.size() < doc.indexes[i]){
@@ -49,7 +47,6 @@ void update_database(string judge, sparseDoc doc, mdlModel &mdlModel){
                 }
         }
 
-        //cout << "\n\t\tAqui";
         for (int k=0; k<nClasses; k++){
                 if ( mdlModel.classes[k] == judge ){
                     if( doc.values[i]>0 )
@@ -59,12 +56,6 @@ void update_database(string judge, sparseDoc doc, mdlModel &mdlModel){
                 }
         }
     }
-    //cout << "\n\tSaiu Atualiza frequencia";
-    //cout << "\nSaiu update database";
-
-//    for (int k=0; k<nClasses; k++){
-//       cout << "Classe: " << mdlModel.classes[k] << " -- Trained " << mdlModel.trained[k] << " -- NC: " << mdlModel.NC[k] << endl;
-//    }
 }
 
 void verificaClasse(mdlModel &mdlModel, string classe){

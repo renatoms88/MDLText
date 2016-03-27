@@ -52,11 +52,9 @@ vector <double> mdl(sparseDoc doc, mdlModel &mdlModel, string featureRelevanceMe
         }
 
         // calculate the token probabitility in each class
-        //cout << "\nCalcula tamanho da classe";
         for (int i=0; i<nClasses; ++i){
 				token_size[i] = calculate_token_size(token_weight[i], mdlModel.NC_weight[i], omega);
 				class_size[i] += token_size[i] * (1.0 / (1.0 + alpha - featureRelevance));
-				//cout << "token_size: " << token_size[i] << endl;//<<class_size[i] << "\t\t--\t";
         }
 
 	}
@@ -65,10 +63,6 @@ vector <double> mdl(sparseDoc doc, mdlModel &mdlModel, string featureRelevanceMe
 	for (int i=0; i<nClasses; ++i){
         cosine_similarity[i] = calculate_cosineSimilarity( doc, norm_doc, mdlModel, i);
         class_size[i] *= -log2(0.5*cosine_similarity[i]);
-        //cout << "normDoc: " << norm_doc << endl;
-        //cout << "normPrototype: " << norm_protype[i] << endl;
-        //cout << "cosine_similarity: " << cosine_similarity[i] << endl;
-        //cout << "class_size: " << class_size[i] << endl;
     }
 
 	return (class_size);
@@ -88,9 +82,7 @@ uint8_t calculate_token_size(double n, double d, double omega)
 		log2 = log(2.0);
 		first_call = false;
 	}
-	//cout << n << " " << d << " ";
 	prob_token = (Const + n) / (d + 1);
-	//cout << prob_token << " -- ";
 	token_size = (uint8_t) ceil((-log(prob_token))/log2);
 
 	return (token_size);
@@ -99,15 +91,13 @@ uint8_t calculate_token_size(double n, double d, double omega)
 double calculate_cosineSimilarity( sparseDoc &doc, double norm_doc, mdlModel &mdlModel, int idClasse ){
     double similarity = 0.0;
     double prototype;
-    //cout << endl << endl;
+
     for(int i=0; i<doc.values.size(); i++){
         if( mdlModel.weightSum.size() > doc.indexes[i]-1){ //se o token não apareceu no treinamento, desconsiderá-lo
             prototype = mdlModel.weightSum[ doc.indexes[i]-1 ][idClasse] / (double)mdlModel.trained[idClasse];
             similarity += (doc.values[i]*prototype) / (double)(norm_doc*mdlModel.norm_protype[idClasse]);
-            //cout << " ::" << doc.values[i] << " " << prototype[ doc.indexes[i]-1 ] << endl;
         }
     }
-    //cout << endl;
 
     return (similarity);
 }

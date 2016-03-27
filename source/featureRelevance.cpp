@@ -40,8 +40,6 @@ double calcula_cf(vector <int> &token_freq) {
 
                     // confidence factor
                     auxCF[k] = pow(((square(Hmin-Hmax) + (Hmax*Hmin) - (K1/SH))/square(SH)), K2)/(1.0 + (K3/SH));
-
-                    //cout << pow(((square(Hmin-Hmax) + (Hmax*Hmin) - (K1/SH))/square(SH)), K2)/(1.0 + (K3/SH)) << " ";
                 }
                 k++;
         }

@@ -1,5 +1,0 @@
-#!/bin/bash
-
-echo 7 Sectors: Train
-echo 
-./mdl-train -i 2 examples/7sectors/7sectors_train models/7sectors-50.mod

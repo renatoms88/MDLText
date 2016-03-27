@@ -17,9 +17,8 @@ int main(int argc, char *argv[]) {
    if(argc<3)
         showHelp();
 
-   //cout << "Argc: " << argc;
    for(int i=1;i<argc-2;i+=2){
-        //cout << argv[i] << "-" << argv[i+1] << endl;
+   
         if(argv[i][0] != '-'){
             showHelp();
             break;
@@ -123,7 +122,6 @@ int main(int argc, char *argv[]) {
                 if(auxPath.length()<2){
                     break;
                 }
-                //cout << auxPath << endl;
 
                 judge.push_back(auxJudge);
                 pathDoc.push_back(auxPath);
@@ -152,10 +150,6 @@ int main(int argc, char *argv[]) {
    else
         showHelp();
 
-   //cout << "\ninput_type: " << input_type;
-   //cout << "\nSave_type: " << save_type;
-   //cout << "\nPathDoc: " << argv[ argc-2 ];
-   //cout << "\nPathModel: " << pathModel;
    double elapsedTime = get_elapsed_time();
    printf("Training completed!\n");
    printf("CPU elapsed time (ms): %lf\n\n", elapsedTime);
@@ -190,13 +184,11 @@ mdlModel mdlTrain(string pathDataset, string pathModel, int weighting_scheme, bo
         int nTrain = 0;
         while ( datasetFile.good() )
         {
-            //cout << "Id: " << nTrain << endl;
             indexes.clear();//limpa o vetores de índices
             values.clear();//limpa o vetores de valores
 
             string str_line;
             getline(datasetFile, str_line); //le a linha inteira onde estão os nomes das classes
-            //cout << str_line << endl;
 
             //create a c_str copy of string classes
             char *cstr2 = new char [str_line.length()+1];
@@ -235,7 +227,6 @@ mdlModel mdlTrain(string pathDataset, string pathModel, int weighting_scheme, bo
                 update_df( doc[0], mdlModel );//atualiza apenas "df", que  o que necessita para aplicar tf-idf em batch
 
                 if(weighting_scheme==1){
-                    cout << "\n\nTF-IDF" << endl;
                     tf2tfidf(doc[0], mdlModel, nTrain+1, false);
                     }
                 else if(weighting_scheme==2)
@@ -290,7 +281,6 @@ mdlModel mdlTrain_text(vector <string> &judge, vector <string> &pathDoc, string 
    int nTrain=0;
    for (int i=0; i<pathDoc.size(); i++){
 
-       //cout << "Sample: " << i << " :::::" << pathDoc[i] << endl;
        if (file_exists(pathDoc[i].c_str())) {
             ifstream file;
             file.open(pathDoc[i].c_str());
@@ -391,7 +381,6 @@ mdlModel mdlTrain_textList(string pathDocs, string pathModel, int tokenizer_id,
             getline( ss, judge[nTrain], ',' );
             texto = texto.erase(0,judge[nTrain].size()+1);//apaga o nome da classe
             texto += '\n';
-            //cout << classe << " Text: " << texto << endl;
 
             if(batch_learning){
                 doc.push_back(sparseDoc());//inicializa o vetor de estruturas do tipo sparseDoc
