@@ -3,10 +3,17 @@
 
 Quick links to this file:
 
+* [Introduction](#introduction)
 * [How to use mdl-train](#how-to-use-mdl-train)
 * [How to use mdl-classify](#how-to-use-mdl-classify)
 * [Examples](#examples)
 * [Datasets used in the experiments reported in a paper submitted to the Machine Learning Journal](examples/libsvm_format/ML_journal/)
+
+## Introduction
+The MDLText is a text classifier based on the minimum description length principle. 
+
+The MDLText can be tested with raw text documents or preprocessed documents stored in [LIBSVM format](https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/). Moreover, the algorithm provides preprocessing modules, such as text normalization and stop word removing.
+
 
 ## How to use mdl-train
 
