@@ -3,10 +3,10 @@
 
 Quick links to this file:
 
-* [How to use mdl-train](# How to use mdl-train)
-* [How to use mdl-classify](# How to use mdl-classify)
-* [Examples](# Examples)
-* [Datasets used in the experiments reported in a paper submitted to the Machine Learning Journal](# examples/libsvm_format/ML_journal/)
+* [How to use mdl-train](#How to use mdl-train)
+* [How to use mdl-classify](#How to use mdl-classify)
+* [Examples](#Examples)
+* [Datasets used in the experiments reported in a paper submitted to the Machine Learning Journal](examples/libsvm_format/ML_journal/)
 
 ## How to use mdl-train
 
