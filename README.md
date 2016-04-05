@@ -12,7 +12,7 @@ Quick links to this file:
 ## Introduction
 The MDLText is a text classifier based on the minimum description length principle. 
 
-The MDLText can be tested with raw text documents or preprocessed documents stored in [LIBSVM format](https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/). Moreover, the algorithm provides preprocessing modules, such as text normalization and stop word removing.
+The MDLText can be tested with raw text documents or preprocessed documents stored in [LIBSVM format](https://www.csie.ntu.edu.tw/~cjlin/libsvm/). Moreover, the algorithm provides preprocessing modules, such as text normalization and stop-words removing.
 
 
 ## How to use mdl-train
