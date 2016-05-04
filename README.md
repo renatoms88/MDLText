@@ -31,13 +31,13 @@ model_fileName:
 
 Options:
     -i input_type : set type of input file (default 0)  
-        -0 -- the path to just one text document  
-        -1 -- the path to a text file which has a list of paths to text documents  
-        -2 -- the path to a text file where each line is a sample in the format <class>,<text>      
-        -3 -- the path to a file in LIBSVM format 
+        0 -- the path to just one text document  
+        1 -- the path to a text file which has a list of paths to text documents  
+        2 -- the path to a text file where each line is a sample in the format <class>,<text>      
+        3 -- the path to a file in LIBSVM format 
    -c class: document class (necessary only when input_type = 0)
-   -w term weighting scheme: set the the term weighting scheme (default 1)
-   	    0 -- if input type is a path to a file in LIBSVM format, will be used the weigths shown in the file,
+   -w term weighting scheme: set the term weighting scheme (default 1)
+   	    0 -- if input type is a path to a file in LIBSVM format, it will be used the weigths shown in the file,
    			otherwise it will be used the raw term-frequency (TF) weighting scheme
    	    1 -- term frequency-inverse document frequency (TF-IDF)
    	    2 -- binary
@@ -82,8 +82,8 @@ Options:
        1 -- the path to a text file which has a list of paths to text documents
        2 -- the path to a text file where each line is a sample
        3 -- the path to a file in LIBSVM format
-   -w term weighting scheme: set the the term weighting scheme (default 1)
-   	    0 -- if input type is a path to a file in LIBSVM format, will be used the weigths shown in the file,
+   -w term weighting scheme: set the term weighting scheme (default 1)
+   	    0 -- if input type is a path to a file in LIBSVM format, it will be used the weigths shown in the file,
    			otherwise it will be used the raw term-frequency (TF) weighting scheme
    	    1 -- term frequency-inverse document frequency (TF-IDF)
    	    2 -- binary
