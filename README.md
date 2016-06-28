@@ -7,7 +7,7 @@ Quick links to this file:
 * [How to use mdl-train](#how-to-use-mdl-train)
 * [How to use mdl-classify](#how-to-use-mdl-classify)
 * [Examples](#examples)
-* [Datasets used in the reported experiments](examples/libsvm_format/experiments/)
+* [Datasets used in the reported experiments](examples/libsvm_format/reported_experiments/)
 
 ## Introduction
 The MDLText is a text classifier based on the minimum description length principle. 
