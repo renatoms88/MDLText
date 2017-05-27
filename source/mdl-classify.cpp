@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
    vector <string> pathDoc;
    int input_type=0, tokenizer_id=1, weighting_scheme=1, auxRemove_stopWords, auxApplyNormalization;
    bool remove_stopWords = true, applyNormalization = false;
-   string auxPath, pathModel, pathResults, featureRelevanceMethod = "CF";
+   string auxPath, pathModel, pathResults, featureRelevanceMethod = "CF", texto;
    double omega = pow(2, 10);//2^10;//tamanho do vocabulário
 
    if(argc<4)
@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
         switch(argv[i][1]){
             case 'i':
                 input_type =  atoi(argv[i+1]);
-                if (input_type<0 || input_type>3)
+                if (input_type<0 || input_type>4)
                         showHelp();
                 break;
             case 'w':
@@ -124,12 +124,24 @@ int main(int argc, char *argv[]) {
         mdlClassify(pathDataset, pathModel, pathResults, featureRelevanceMethod, omega, weighting_scheme);
         toc();
    }
+   else if(input_type==4){// se o input_type==0, é preciso indicar a classe do documento
+        texto = string(argv[ argc-3 ]);
+        tic();
+        cout << texto << endl;
+        cout << pathModel << endl;
+        cout << pathResults << endl;
+        cout << endl << endl;
+        mdlClassify_string(texto, pathModel, pathResults, featureRelevanceMethod, omega, tokenizer_id, remove_stopWords, applyNormalization, weighting_scheme);
+        toc();
+   }
    else
         showHelp();
 
    double elapsedTime = get_elapsed_time();
-   printf("Classification completed!\n");
-   printf("CPU elapsed time (ms): %lf\n\n", elapsedTime);
+   if(input_type!=0 && input_type!=4){
+        printf("Classification completed!\n");
+        printf("CPU elapsed time (ms): %lf\n\n", elapsedTime);
+   }
 
    return 0;
 }
@@ -300,18 +312,22 @@ vector<string> mdlClassify_text(vector <string> &pathDoc, string pathModel, stri
                       }
                       file.close();
 
-                      doc = tokenizer(texto, MAX_MESSAGE_SIZE, WORD_CUT_MIN, WORD_CUT_MAX, tokenizer_id, remove_stopWords);
+                      doc = tokenizer(texto, MAX_MESSAGE_SIZE, WORD_CUT_MIN, WORD_CUT_MAX, remove_stopWords, tokenizer_id);
                       if (applyNormalization == true) tokens = normalizeVocabulary(tokens, dictionary);
 
-                      search_dictionary(doc, mdlModel, false);//cadastra a posição onde cada token do documento está no dicionário
+                      vector <double> class_size(mdlModel.classes.size(),0.0);//inicializa o tamanho de descrição com tamanho 0 para todas as classes
+                      if( doc.tokens.size() > 0 ){//se  o documento não possuir nenhum token ele não entra no if
 
-                      if(weighting_scheme==1)
-                            tf2tfidf(doc, mdlModel, mdlModel.nTrain, false);
-                      else if(weighting_scheme==2)
-                            binarize(doc);
+                                  search_dictionary(doc, mdlModel, false);//cadastra a posição onde cada token do documento está no dicionário
 
-                      // classify the message using MDL classifier
-                      vector <double> class_size = mdl(doc, mdlModel, featureRelevanceMethod, omega);
+                                  if(weighting_scheme==1)
+                                        tf2tfidf(doc, mdlModel, mdlModel.nTrain, false);
+                                  else if(weighting_scheme==2)
+                                        binarize(doc);
+
+                                  // classify the message using MDL classifier
+                                  class_size = mdl(doc, mdlModel, featureRelevanceMethod, omega);
+                       }
 
                        int idxMin=0;
                        double minClassSize = class_size[0];
@@ -348,6 +364,84 @@ vector<string> mdlClassify_text(vector <string> &pathDoc, string pathModel, stri
    }
 
     return classification;
+}
+
+
+vector<string> mdlClassify_string(string texto, string pathModel, string pathResults,
+                string featureRelevanceMethod, double omega, int tokenizer_id, bool remove_stopWords, bool applyNormalization, int weighting_scheme) {
+
+   // variables
+   int nClasses;
+   //string document; // message to be classified
+   //string featureRelevanceMethod; //Nome do metodo para calcular a relevancia da feature
+   vector <string> classification;
+   //size_t number_of_documents;
+
+   sparseDoc doc;
+
+   int number_of_tokens, number_of_not_members; // number of tokens that are not found into the database
+   map<string, vector <int>> members; // set of tokens of the message which are in database
+   vector<string> tokens; // set of tokens extract from the message
+   map<string,string> dictionary;
+   //set<string> classes;
+   ifstream filter_in; // file to store the filter out
+   ofstream filter_out; // file to store the filter out
+
+   mdlModel mdlModel;//train model
+
+
+   load_database(mdlModel, pathModel, true); //se o arquivo de modelo existir, carrega o modelo
+   if (applyNormalization == true) dictionary = loadDict (PATH2DICT);
+
+   // open filter_out file and update it
+   filter_out.open(pathResults.c_str(),ios::app);//appending the content to the current content of the file
+
+
+
+   doc = tokenizer(texto, MAX_MESSAGE_SIZE, WORD_CUT_MIN, WORD_CUT_MAX, remove_stopWords, tokenizer_id);
+   if (applyNormalization == true) tokens = normalizeVocabulary(tokens, dictionary);
+
+   vector <double> class_size(mdlModel.classes.size(),0.0);//inicializa o tamanho de descrição com tamanho 0 para todas as classes
+   if( doc.tokens.size() > 0 ){//se  o documento não possuir nenhum token ele não entra no if
+       search_dictionary(doc, mdlModel, false);//cadastra a posição onde cada token do documento está no dicionário
+
+       if(weighting_scheme==1)
+            tf2tfidf(doc, mdlModel, mdlModel.nTrain, false);
+       else if(weighting_scheme==2)
+            binarize(doc);
+
+       // classify the message using MDL classifier
+       class_size = mdl(doc, mdlModel, featureRelevanceMethod, omega);
+   }
+
+   int idxMin=0;
+   double minClassSize = class_size[0];
+
+   for (int j=1; j<mdlModel.classes.size(); ++j){
+        if (class_size[j] < minClassSize){
+            idxMin = j;
+            minClassSize = class_size[j];
+        }
+        else if (class_size[j] == minClassSize){
+            int sumTrain = accumulate(mdlModel.trained.begin(),mdlModel.trained.end(),0);
+            double prob_class_j, prob_class_min;
+            prob_class_j = mdlModel.trained[j] / sumTrain;
+            prob_class_min = mdlModel.trained[idxMin] / sumTrain;
+
+            if(prob_class_j > prob_class_min){
+                    idxMin = j;
+                    minClassSize = class_size[j];
+            }
+       }
+   }
+
+   classification.push_back( mdlModel.classes[idxMin] );
+
+   filter_out << mdlModel.classes[idxMin] << " " << texto << endl; //salva o resultado da classificação no arquivo de texto
+
+   filter_out.close();
+
+   return classification;
 }
 
 
@@ -391,18 +485,21 @@ vector<string> mdlClassify_textList(string pathDocs, string pathModel, string pa
                       texto += '\n';
 
                       // extract all tokens, following the given parameters
-                      doc = tokenizer(texto, MAX_MESSAGE_SIZE, WORD_CUT_MIN, WORD_CUT_MAX, tokenizer_id, remove_stopWords);
+                      doc = tokenizer(texto, MAX_MESSAGE_SIZE, WORD_CUT_MIN, WORD_CUT_MAX, remove_stopWords, tokenizer_id);
                       if (applyNormalization == true) tokens = normalizeVocabulary(tokens, dictionary);
 
-                      search_dictionary(doc, mdlModel, false);//cadastra a posição onde cada token do documento está no dicionário
+                      vector <double> class_size(mdlModel.classes.size(),0.0);//inicializa o tamanho de descrição com tamanho 0 para todas as classes
+                      if( doc.tokens.size() > 0 ){//se  o documento não possuir nenhum token ele não entra no if
+                          search_dictionary(doc, mdlModel, false);//cadastra a posição onde cada token do documento está no dicionário
 
-                      if(weighting_scheme==1)
-                            tf2tfidf(doc, mdlModel, mdlModel.nTrain, false);
-                      else if(weighting_scheme==2)
-                            binarize(doc);
+                          if(weighting_scheme==1)
+                                tf2tfidf(doc, mdlModel, mdlModel.nTrain, false);
+                          else if(weighting_scheme==2)
+                                binarize(doc);
 
-                      // classify the message using MDL classifier
-                      vector <double> class_size = mdl(doc, mdlModel, featureRelevanceMethod, omega);
+                          // classify the message using MDL classifier
+                          class_size = mdl(doc, mdlModel, featureRelevanceMethod, omega);
+                      }
 
                int idxMin=0;
                double minClassSize = class_size[0];
@@ -412,7 +509,7 @@ vector<string> mdlClassify_textList(string pathDocs, string pathModel, string pa
                                 idxMin = j;
                                 minClassSize = class_size[j];
                         }
-                        else if (class_size[j] == minClassSize){
+                        else if (class_size[j] == minClassSize){//em caso de empate, escolhe a classe com maior probabilidade
                                 int sumTrain = accumulate(mdlModel.trained.begin(),mdlModel.trained.end(),0);
                                 double prob_class_j, prob_class_min;
                                 prob_class_j = mdlModel.trained[j] / sumTrain;
@@ -457,6 +554,7 @@ void showHelp(){
         cout << "       1 -- the path to a text file which has a list of paths to text documents\n";
         cout << "       2 -- the path to a text file where each line is a sample\n";
         cout << "       3 -- the path to a libsvm file\n";
+        cout << "       4 -- a string\n";
         cout << "   -w term weighting scheme: set the the term weighting scheme (default 1)\n";
         cout << "       0 -- if input type is a path to a file in LIBSVM format, will be used the weigths shown in the file,\n";
         cout << "                           otherwise it will be used the raw term-frequency (TF) weighting scheme\n";
@@ -480,4 +578,5 @@ void showHelp(){
         cout << "==============================================================================================\n\n";
         exit(1);
 }
+
 

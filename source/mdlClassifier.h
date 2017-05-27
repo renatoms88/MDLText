@@ -15,6 +15,7 @@
 #include <stdexcept>
 #include <vector>
 #include <algorithm>
+#include <numeric>
 using namespace std;
 
 /*---------------------------- Parameters -----------------------*/
@@ -62,6 +63,9 @@ mdlModel mdlTrain_textList(string pathDocs, string pathModel, int tokenizer_id, 
 mdlModel mdlTrain_text(vector <string> &judge, vector <string> &pathDoc, string pathModel,
             int tokenizer_id, bool remove_stopWords, bool applyNormalization, int weighting_scheme, bool batch_learning);
 
+mdlModel mdlTrain_string(string judge, string texto, string pathModel,
+            int tokenizer_id, bool remove_stopWords, bool applyNormalization, int weighting_scheme);
+
 //function at classify.cpp
 map<string,vector<string>> mdlClassify(string pathDataset, string pathModel, string pathResults,
                       string featureRelevanceMethod, double omega, int weighting_scheme);
@@ -69,6 +73,9 @@ vector<string> mdlClassify_textList(string pathDocs, string pathModel, string pa
                          string featureRelevanceMethod, double omega, int tokenizer_id, bool remove_stopWords, bool applyNormalization, int weighting_scheme);
 
 vector<string> mdlClassify_text(vector <string> &pathDoc, string pathModel, string pathResults,
+                string featureRelevanceMethod, double omega, int tokenizer_id, bool remove_stopWords, bool applyNormalization, int weighting_scheme);
+
+vector<string> mdlClassify_string(string texto, string pathModel, string pathResults,
                 string featureRelevanceMethod, double omega, int tokenizer_id, bool remove_stopWords, bool applyNormalization, int weighting_scheme);
 
 // function at database.cpp

@@ -9,16 +9,17 @@ int main(int argc, char *argv[]) {
    // detect problems with the inputs
 
    vector <string> judge, pathDoc;
-   string auxJudge, auxPath, pathModel;
+   string auxJudge, auxPath, pathModel, texto;
 
    int input_type=0, save_type=0, tokenizer_id=1, auxbatch_learning=1, weighting_scheme=1, auxRemove_stopWords, auxApplyNormalization;
    bool remove_stopWords = true, applyNormalization = false, batch_learning = true;
 
-   if(argc<3)
+   if(argc<3){
         showHelp();
+   }
 
    for(int i=1;i<argc-2;i+=2){
-   
+
         if(argv[i][0] != '-'){
             showHelp();
             break;
@@ -26,14 +27,22 @@ int main(int argc, char *argv[]) {
         switch(argv[i][1]){
             case 'i':
                 input_type =  atoi(argv[i+1]);
-                if(input_type<0 || input_type>3)
+                if(input_type<0 || input_type>4){
                         showHelp();
+                }
                 break;
             case 'c':
-                if(input_type!=0) //esse parâmetro só deve ser usado com i==0
+                if(input_type!=0 && input_type!=4){ //esse parâmetro só deve ser usado com i==0 ou i==4
                         showHelp();
-                else
-                    judge.push_back(argv[i+1]);
+                }
+                else{
+                    if (input_type==0){
+                        judge.push_back(argv[i+1]);
+                    }
+                    else{
+                        auxJudge = string(argv[i+1]);
+                    }
+                }
                 break;
             case 'w':
                 weighting_scheme =  atoi(argv[i+1]);
@@ -147,12 +156,25 @@ int main(int argc, char *argv[]) {
        mdlTrain(pathDataset, pathModel, weighting_scheme, batch_learning);
        toc();
    }
+   else if(input_type==4){// se o input_type==0, é preciso indicar a classe do documento
+        if(auxJudge.size()==0){
+                showHelp();
+        }
+        else{
+            texto = string(argv[ argc-2 ]);
+            tic();
+            mdlTrain_string(auxJudge, texto, pathModel, tokenizer_id, remove_stopWords, applyNormalization, weighting_scheme);
+            toc();
+        }
+   }
    else
         showHelp();
 
    double elapsedTime = get_elapsed_time();
-   printf("Training completed!\n");
-   printf("CPU elapsed time (ms): %lf\n\n", elapsedTime);
+   if(input_type!=0 && input_type!=4){
+        printf("Training completed!\n");
+        printf("CPU elapsed time (ms): %lf\n\n", elapsedTime);
+    }
 
    return 0;
 }
@@ -346,6 +368,50 @@ mdlModel mdlTrain_text(vector <string> &judge, vector <string> &pathDoc, string 
    return mdlModel;
 }
 
+
+mdlModel mdlTrain_string(string judge, string texto, string pathModel,
+            int tokenizer_id, bool remove_stopWords, bool applyNormalization, int weighting_scheme) {
+
+   //string document, judge;
+   map<string,string> dictionary;
+   ifstream filter_out; // fil	e of filter out
+   string classification;
+
+   mdlModel mdlModel;//train model
+   load_database(mdlModel, pathModel, true); //se o arquivo de modelo existir, carrega o modelo
+
+    vector<sparseDoc> doc;
+    doc.push_back(sparseDoc());//inicializa o vetor de estruturas do tipo sparseDoc
+
+   //load_database(mdlModel, pathModel); //se o arquivo de modelo existir, carrega o modelo
+   if (applyNormalization == true) dictionary = loadDict (PATH2DICT);
+
+   doc[0] = tokenizer(texto, MAX_MESSAGE_SIZE*2, WORD_CUT_MIN, WORD_CUT_MAX, remove_stopWords, tokenizer_id);
+
+   if (applyNormalization == true) doc[0].tokens = normalizeVocabulary(doc[0].tokens, dictionary);
+
+   search_dictionary(doc[0], mdlModel, true);//cadastra a posição onde cada token do documento está no dicionário
+
+   update_df( doc[0], mdlModel );//atualiza apenas "df", que  o que necessita para aplicar tf-idf em batch
+
+   if(weighting_scheme==1)
+        tf2tfidf(doc[0], mdlModel, mdlModel.nTrain+1, false);
+   else if(weighting_scheme==2)
+        binarize(doc[0]);
+
+   update_database(judge, doc[0], mdlModel);
+
+   doc[0].tokens.clear();//clear all values of the vector
+   doc[0].indexes.clear();//clear all values of the vector
+   doc[0].values.clear();//clear all values of the vector
+
+   mdlModel.norm_protype = l2_norm_prototype(mdlModel.weightSum, mdlModel.trained);
+   save_database(mdlModel, pathModel, true);
+
+   return mdlModel;
+}
+
+
 mdlModel mdlTrain_textList(string pathDocs, string pathModel, int tokenizer_id,
                                         bool remove_stopWords, bool applyNormalization, int weighting_scheme, bool batch_learning) {
 
@@ -452,7 +518,8 @@ void showHelp(){
         cout << "       1 -- the path to a text file which has a list of paths to text documents\n";
         cout << "       2 -- the path to a text file where each line is a sample in the format <class>,<text>\n";
         cout << "       3 -- the path to a file in LIBSVM format\n";
-        cout << "   -c class: document class (necessary only when input_type = 0)\n";
+        cout << "       4 -- a string\n";
+        cout << "   -c class: document class (necessary only when input_type = 0 or input_type = 4)\n";
         cout << "   -w term weighting scheme: set the the term weighting scheme (default 1)\n";
         cout << "       0 -- if input type is a path to a file in LIBSVM format, will be used the weigths shown in the file,\n";
         cout << "                           otherwise it will be used the raw term-frequency (TF) weighting scheme\n";
