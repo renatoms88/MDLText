@@ -160,3 +160,21 @@ If you find MDLText helpful, please cite it as:
 
 Silva, R. M., Almeida, T. A., & Yamakami, A. (2017). MDLText: An efficient and lightweight text classifier. Knowledge-Based Systems, 118, 152-164.
 doi:[http://dx.doi.org/10.1016/j.knosys.2016.11.018](http://dx.doi.org/10.1016/j.knosys.2016.11.018).
+
+* BibTeX:
+		
+    @article{silva-almeida-yamakami-knosys:2017,
+    	author = {Renato M. Silva and Tiago A. Almeida and Akebo Yamakami},
+    	title = {{MDLText}: An efficient and lightweight text classifier},
+    	journal = {Knowledge-Based Systems},
+    	volume = {118},
+    	pages = {152--164},
+    	year = {2017},
+    	month = feb,
+    	issn = {0950-7051},
+    	doi = {http://dx.doi.org/10.1016/j.knosys.2016.11.018},
+    	publisher={Elsevier}
+    }
+        
+
+
