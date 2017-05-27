@@ -7,8 +7,8 @@ Quick links to this file:
 * [How to use mdl-train](#how-to-use-mdl-train)
 * [How to use mdl-classify](#how-to-use-mdl-classify)
 * [Examples](#examples)
-* [Additional Information](#additional-information)
 * [Datasets used in the reported experiments](examples/libsvm_format/textCorpora/)
+* [Additional Information](#additional-information)
 
 ## Introduction
 The MDLText is a text classifier based on the minimum description length principle. 
@@ -149,14 +149,14 @@ To employ MDL classifier on a text string:
 
 * For training:
 		
-		./mdl-train -i 4 "spam" "check out the real poker online at this cool site" models/mdl_string.mod
+		./mdl-train -i 4 -c spam "check out the real poker online at this cool site" models/mdl_string.mod
 		
 * For classifying:
 		
 		./mdl-classify -i 4 "this is a site where you can find cool things to buy" models/mdl_string.mod results/mdlCF_string.res
 
 ## Additional Information
-If you find MDLText helpful, please cite it as
+If you find MDLText helpful, please cite it as:
 
 Silva, R. M., Almeida, T. A., & Yamakami, A. (2017). MDLText: An efficient and lightweight text classifier. Knowledge-Based Systems, 118, 152-164.
 doi:[http://dx.doi.org/10.1016/j.knosys.2016.11.018](http://dx.doi.org/10.1016/j.knosys.2016.11.018).
