@@ -7,6 +7,7 @@ Quick links to this file:
 * [How to use mdl-train](#how-to-use-mdl-train)
 * [How to use mdl-classify](#how-to-use-mdl-classify)
 * [Examples](#examples)
+* [Additional Information](#additional-information)
 * [Datasets used in the reported experiments](examples/libsvm_format/textCorpora/)
 
 ## Introduction
@@ -34,8 +35,8 @@ Options:
         0 -- the path to just one text document  
         1 -- the path to a text file which has a list of paths to text documents  
         2 -- the path to a text file where each line is a sample in the format <class>,<text>      
-        3 -- the path to a file in LIBSVM format 
-	4 -- a string
+        3 -- the path to a file in LIBSVM format
+        4 -- a string
    -c class: document class (necessary only when input_type = 0 or input_type = 4)
    -w term weighting scheme: set the term weighting scheme (default 1)
    	    0 -- if input type is a path to a file in LIBSVM format, it will be used the weigths shown in the file,
@@ -143,3 +144,19 @@ To employ MDL classifier on datasets stored in LIBSVM format:
 * For classifying:
 		
 		./mdl-classify -i 3 examples/libsvm_format/reuters_test.libsvm models/mdl_reuters.mod results/mdlCF_reuters.res
+
+To employ MDL classifier on a text string:
+
+* For training:
+		
+		./mdl-train -i 4 "spam" "check out the real poker online at this cool site" models/mdl_string.mod
+		
+* For classifying:
+		
+		./mdl-classify -i 4 "this is a site where you can find cool things to buy" models/mdl_string.mod results/mdlCF_string.res
+
+## Additional Information
+If you find MDLText helpful, please cite it as
+
+Silva, R. M., Almeida, T. A., & Yamakami, A. (2017). MDLText: An efficient and lightweight text classifier. Knowledge-Based Systems, 118, 152-164.
+doi:[http://dx.doi.org/10.1016/j.knosys.2016.11.018](http://dx.doi.org/10.1016/j.knosys.2016.11.018).
