@@ -127,10 +127,6 @@ int main(int argc, char *argv[]) {
    else if(input_type==4){// se o input_type==0, é preciso indicar a classe do documento
         texto = string(argv[ argc-3 ]);
         tic();
-        cout << texto << endl;
-        cout << pathModel << endl;
-        cout << pathResults << endl;
-        cout << endl << endl;
         mdlClassify_string(texto, pathModel, pathResults, featureRelevanceMethod, omega, tokenizer_id, remove_stopWords, applyNormalization, weighting_scheme);
         toc();
    }
