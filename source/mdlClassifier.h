@@ -87,6 +87,8 @@ void update_database(string judge, sparseDoc doc, mdlModel &mdlModel);
 void save_database(mdlModel &mdlModel, string pathModel, bool save_tokens);
 void search_dictionary(sparseDoc &doc, mdlModel &mdlModel, bool update_dictionary);
 void load_database(mdlModel &mdlModel, string pathModel, bool get_tokens);
+void print_database(mdlModel &mdlModel);
+void print_sparseDoc(sparseDoc &doc);
 
 // function at mdlclassifier.cpp
 vector <double> mdl(sparseDoc doc, mdlModel &mdlModel, string featureRelevanceMethod, double omega);

@@ -49,7 +49,7 @@ void update_database(string judge, sparseDoc doc, mdlModel &mdlModel){
 
         for (int k=0; k<nClasses; k++){
                 if ( mdlModel.classes[k] == judge ){
-                    if( doc.values[i]>0 )
+                    //if( doc.values[i]>0 )
                         mdlModel.frequency[ doc.indexes[i]-1 ][k] ++;
                         mdlModel.weightSum[ doc.indexes[i]-1 ][k] += doc.values[i];
                         mdlModel.NC_weight[k] += doc.values[i];
@@ -224,6 +224,70 @@ void load_database(mdlModel &mdlModel, string pathModel, bool get_tokens){
     else{
     	mdlModel.nTrain = 0;
     }
+}
+
+void print_database(mdlModel &mdlModel){
+
+    if (mdlModel.frequency.size()>0){
+            cout << "\nModelo\n";
+            cout << "Classes size: " << mdlModel.classes.size() << endl;
+            for (int k=0; k<mdlModel.classes.size(); k++){
+                cout <<  mdlModel.classes[k] << " ";
+            }
+            cout << "\n";
+
+            cout << "Classes size: " << mdlModel.classes.size() << endl;
+            for (int k=0; k<mdlModel.classes.size(); k++){
+                cout <<  mdlModel.trained[k] << " ";
+            }
+            cout << "\n";
+            cout << "Aqui0: " << endl;
+            cout << "mdlModel.NC.size: " << mdlModel.NC[0] << endl;
+            for (int k=0; k<mdlModel.classes.size(); k++){
+                cout <<  mdlModel.NC[k] << " ";
+            }
+            cout << "mdlModel.NC_weight.size: " << mdlModel.NC_weight.size() << endl;
+            for (int k=0; k<mdlModel.classes.size(); k++){
+                cout <<  mdlModel.NC_weight[k] << " ";
+            }
+
+            //cout << "mdlModel.norm_protype.size: " << mdlModel.norm_protype.size() << endl;
+            //for (int k=0; k<mdlModel.classes.size(); k++){
+            //    cout <<  mdlModel.norm_protype[k] << " ";
+            //}
+            //cout << "\n";
+
+            for (int j=0; j<mdlModel.frequency.size(); j++){
+                for (int k=0; k<mdlModel.classes.size(); k++){
+                    cout <<  mdlModel.frequency[j][k] << " ";
+                }
+                cout <<  mdlModel.df[j] << " ";
+                for (int k=0; k<mdlModel.classes.size(); k++){
+                    cout <<  mdlModel.weightSum[j][k] << " ";
+                }
+                cout << "\n";
+            }
+    }
+    else{
+        cout << "Modelo vazio" << endl;
+    }
+}
+
+void print_sparseDoc(sparseDoc &doc){
+    cout << "\nTokens: ";
+    for (int k=0; k<doc.tokens.size(); k++){
+        cout << doc.tokens[k] << " -- ";
+    }
+    cout << "\nIndex: ";
+    for (int k=0; k<doc.indexes.size(); k++){
+        cout << doc.indexes[k] << " ";
+    }
+
+    cout << "\nValues: ";
+    for (int k=0; k<doc.values.size(); k++){
+        cout << doc.values[k] << " ";
+    }
+    cout << endl;
 }
 
 
