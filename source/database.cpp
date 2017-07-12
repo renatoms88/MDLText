@@ -230,23 +230,20 @@ void print_database(mdlModel &mdlModel){
 
     if (mdlModel.frequency.size()>0){
             cout << "\nModelo\n";
-            cout << "Classes size: " << mdlModel.classes.size() << endl;
             for (int k=0; k<mdlModel.classes.size(); k++){
                 cout <<  mdlModel.classes[k] << " ";
             }
             cout << "\n";
 
-            cout << "Classes size: " << mdlModel.classes.size() << endl;
             for (int k=0; k<mdlModel.classes.size(); k++){
                 cout <<  mdlModel.trained[k] << " ";
             }
             cout << "\n";
-            cout << "Aqui0: " << endl;
-            cout << "mdlModel.NC.size: " << mdlModel.NC[0] << endl;
+
             for (int k=0; k<mdlModel.classes.size(); k++){
                 cout <<  mdlModel.NC[k] << " ";
             }
-            cout << "mdlModel.NC_weight.size: " << mdlModel.NC_weight.size() << endl;
+
             for (int k=0; k<mdlModel.classes.size(); k++){
                 cout <<  mdlModel.NC_weight[k] << " ";
             }
