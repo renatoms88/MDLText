@@ -24,16 +24,16 @@ DEFS = mdlClassifier.h
 
 # ------------------------ Rules --------------------------------
 
-all: mdl-classify mdl-train
+all: MDLText-classify MDLText-train
 
-mdl-classify: mdl-classify.o ${OBJ}
-	${CC} -o $@ ${CFLAGS} mdl-classify.o ${OBJ} ${LIBS}
+MDLText-classify: MDLText-classify.o ${OBJ}
+	${CC} -o $@ ${CFLAGS} MDLText-classify.o ${OBJ} ${LIBS}
 
-mdl-train: mdl-train.o ${OBJ}
-	${CC} -o $@ ${CFLAGS} mdl-train.o ${OBJ} ${LIBS}
+MDLText-train: MDLText-train.o ${OBJ}
+	${CC} -o $@ ${CFLAGS} MDLText-train.o ${OBJ} ${LIBS}
 
 clean:
-	rm *.o; rm mdl-classify; rm mdl-train
+	rm *.o; rm MDLText-classify; rm MDLText-train
 
 # Implicit rule used by Gnu Make: $(CC) -c $(CPPFLAGS) $(CFLAGS)
 ${OBJ}: ${DEFS}

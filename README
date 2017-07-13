@@ -1,18 +1,18 @@
 Table of Contents
 =================
 
-	1) How to use mdl-train 
-	2) How to use mdl-classify
+	1) How to use MDLText-train 
+	2) How to use MDLText-classify
 	3) Examples
 
 
 
 ====================
-How to use mdl-train
+How to use MDLText-train
 ====================
 
 ------------------------------------------------------------------------------
-Usage: mdl-train [options] [input_fileName] [model_fileName]
+Usage: MDLText-train [options] [input_fileName] [model_fileName]
 
 input_fileName:
    Relative path to a text file. Such file can be just one text sample to be trained, a index
@@ -55,11 +55,11 @@ Options:
 
 
 =======================
-How to use mdl-classify
+How to use MDLText-classify
 =======================
 
 ------------------------------------------------------------------------------
-Usage: mdl-classify [options] [input_fileName] [model_fileName] [output_fileName]
+Usage: MDLText-classify [options] [input_fileName] [model_fileName] [output_fileName]
 
 input_fileName:
    Relative path to a text file. Such file can be just one text sample to be trained, a index
@@ -108,7 +108,7 @@ We provide some text collections in folder "examples/"
 
 To employ MDL classifier on polarityReview text collection in which each sample is a text file:
 	- For training:
-		./mdl-train -i 1 examples/polarityReview/polarityReview_train
+		./MDLText-train -i 1 examples/polarityReview/polarityReview_train
 models/mdl_polarityReview.mod
 		
 	- For classifying:
@@ -119,18 +119,18 @@ models/mdl_polarityReview.mod results/mdlCF_polarityReview.res
 
 To employ MDL classifier on SMS Spam Collection in which each sample is a line of a text file:
 	- For training:
-		./mdl-train -i 2 examples/SMSSpamCollection/smsspamcollection_train
+		./MDLText-train -i 2 examples/SMSSpamCollection/smsspamcollection_train
 models/mdl_SMS.mod
 		
 	- for classifying:
-		./mdl-classify -i 2 examples/SMSSpamCollection/smsspamcollection_test models/mdl_SMS.mod results/mdlCF_SMS.res
+		./MDLText-classify -i 2 examples/SMSSpamCollection/smsspamcollection_test models/mdl_SMS.mod results/mdlCF_SMS.res
 		
 
 To employ MDL classifier on datasets stored in LIBSVM format:
 	- For training:
-		./mdl-train -i 3 examples/libsvm_format/reuters_train.libsvm
+		./MDLText-train -i 3 examples/libsvm_format/reuters_train.libsvm
 models/mdl_SMS.mod
 		
 	- for classifying:
-		./mdl-classify -i 3 examples/libsvm_format/reuters_test.libsvm models/mdl_reuters.mod results/mdlCF_reuters.res
+		./MDLText-classify -i 3 examples/libsvm_format/reuters_test.libsvm models/mdl_reuters.mod results/mdlCF_reuters.res
 

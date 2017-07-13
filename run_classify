@@ -2,7 +2,7 @@
 
 echo polarityReview: Classify
 echo 
-./mdl-classify -i 1 examples/polarityReview/polarityReview_test models/polarityReview-50.mod results/polarityReview-50.res
+./MDLText-classify -i 1 examples/polarityReview/polarityReview_test models/polarityReview-50.mod results/polarityReview-50.res
 
 
 echo polarityReview: Performance
@@ -18,7 +18,7 @@ echo -------------------------
 
 echo SMSSpamCollection: Classify
 echo 
-./mdl-classify -i 2 examples/SMSSpamCollection/SMSSpamCollection_test models/SMSSpamCollection-50.mod results/SMSSpamCollection-50.res
+./MDLText-classify -i 2 examples/SMSSpamCollection/SMSSpamCollection_test models/SMSSpamCollection-50.mod results/SMSSpamCollection-50.res
 
 
 echo SMSSpamCollection: Performance
@@ -35,7 +35,7 @@ echo ----------------------------
 
 echo Reuters: Classify
 echo 
-./mdl-classify -i 3 examples/libsvm_format/reuters_test.libsvm models/mdl_reuters.mod results/mdlCF_reuters.res
+./MDLText-classify -i 3 examples/libsvm_format/reuters_test.libsvm models/mdl_reuters.mod results/mdlCF_reuters.res
 
 
 echo Reuters: Performance

@@ -4,8 +4,8 @@
 Quick links to this file:
 
 * [Introduction](#introduction)
-* [How to use mdl-train](#how-to-use-mdl-train)
-* [How to use mdl-classify](#how-to-use-mdl-classify)
+* [How to use MDLText-train](#how-to-use-MDLText-train)
+* [How to use MDLText-classify](#how-to-use-MDLText-classify)
 * [Examples](#examples)
 * [Datasets used in the reported experiments](examples/libsvm_format/textCorpora/)
 * [Additional Information](#additional-information)
@@ -16,10 +16,10 @@ The MDLText is a text classifier based on the minimum description length princip
 The MDLText can be tested with raw text documents or preprocessed documents stored in [LIBSVM format](https://www.csie.ntu.edu.tw/~cjlin/libsvm/). Moreover, the algorithm provides preprocessing modules, such as text normalization and stop-words removing.
 
 
-## How to use mdl-train
+## How to use MDLText-train
 
 ------------------------------------------------------------------------------
-Usage: ```mdl-train [options] [input_fileName] [model_fileName]``` 
+Usage: ```MDLText-train [options] [input_fileName] [model_fileName]``` 
 
 ```
 input_fileName: 
@@ -63,10 +63,10 @@ Options:
 ``` 
 
 
-## How to use mdl-classify
+## How to use MDLText-classify
 
 ------------------------------------------------------------------------------
-Usage: ```mdl-classify [options] [input_fileName] [model_fileName] [output_fileName]```
+Usage: ```MDLText-classify [options] [input_fileName] [model_fileName] [output_fileName]```
 
 ```
 input_fileName:
@@ -116,7 +116,7 @@ To employ MDL classifier on polarityReview text collection in which each sample 
 
 * For training:
 		
-		./mdl-train -i 1 examples/polarityReview/polarityReview_train models/mdl_polarityReview.mod
+		./MDLText-train -i 1 examples/polarityReview/polarityReview_train models/mdl_polarityReview.mod
 		
 * For classifying:
 		
@@ -128,32 +128,32 @@ To employ MDL classifier on SMS Spam Collection in which each sample is a line o
 
 * For training:
 		
-		./mdl-train -i 2 examples/SMSSpamCollection/smsspamcollection_train models/mdl_SMS.mod
+		./MDLText-train -i 2 examples/SMSSpamCollection/smsspamcollection_train models/mdl_SMS.mod
 		
 * For classifying:
 		
-		./mdl-classify -i 2 examples/SMSSpamCollection/smsspamcollection_test models/mdl_SMS.mod results/mdlCF_SMS.res
+		./MDLText-classify -i 2 examples/SMSSpamCollection/smsspamcollection_test models/mdl_SMS.mod results/mdlCF_SMS.res
 		
 
 To employ MDL classifier on datasets stored in LIBSVM format:
 
 * For training:
 		
-		./mdl-train -i 3 examples/libsvm_format/reuters_train.libsvm models/mdl_reuters.mod
+		./MDLText-train -i 3 examples/libsvm_format/reuters_train.libsvm models/mdl_reuters.mod
 		
 * For classifying:
 		
-		./mdl-classify -i 3 examples/libsvm_format/reuters_test.libsvm models/mdl_reuters.mod results/mdlCF_reuters.res
+		./MDLText-classify -i 3 examples/libsvm_format/reuters_test.libsvm models/mdl_reuters.mod results/mdlCF_reuters.res
 
 To employ MDL classifier on a text string:
 
 * For training:
 		
-		./mdl-train -i 4 -c spam "check out the real poker online at this cool site" models/mdl_string.mod
+		./MDLText-train -i 4 -c spam "check out the real poker online at this cool site" models/mdl_string.mod
 		
 * For classifying:
 		
-		./mdl-classify -i 4 "this is a site where you can find cool things to buy" models/mdl_string.mod results/mdlCF_string.res
+		./MDLText-classify -i 4 "this is a site where you can find cool things to buy" models/mdl_string.mod results/mdlCF_string.res
 
 ## Additional Information
 If you find MDLText helpful, please cite it as:
