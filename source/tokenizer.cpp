@@ -168,9 +168,10 @@ sparseDoc tokenize_A(string &message, size_t word_cut_min, size_t word_cut_max, 
     message.erase(0, pos + 1);
     if (word.size() >= word_cut_min && word.size() <= word_cut_max && !isTokenInDataset(doc.tokens, word)) {
        if (remove_stopwords == true) {
-          if (isStopWord(word, NUMBER_OF_STOPWORDS) == false)
+          if (isStopWord(word, NUMBER_OF_STOPWORDS) == false){
             doc.tokens.push_back(word);
             doc.values.push_back(1.0);
+           }
         }
         else{
           doc.tokens.push_back(word);
@@ -211,9 +212,10 @@ sparseDoc tokenize_B(string &message, size_t word_cut_min, size_t word_cut_max, 
       if ( !word.empty() && !isTokenInDataset(doc.tokens, word)){
       //if ( !word.empty() ){
         if (remove_stopwords == true) {
-          if (isStopWord(word, NUMBER_OF_STOPWORDS) == false)
+          if (isStopWord(word, NUMBER_OF_STOPWORDS) == false){
             doc.tokens.push_back(word);
             doc.values.push_back(1.0);
+           }
         }
         else{
           doc.tokens.push_back(word);
